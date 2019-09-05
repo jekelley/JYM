@@ -49,12 +49,13 @@ class DoRelease(models.Model):
         #     {'bold': False, 'align': 'left', 'font_size': 10})
         table_cell_format = xlwt.easyxf("font: bold off;")
 
+        row += 1
         for do in aggregate_order.x_studio_delivery_orders:
             so = self.env['sale.order'].search(
                 [('name', '=', do.group_id.name)])
 
             # do_line_id = do.move_ids_without_package[0]
-            row += 1
+            
             for line in do.move_ids_without_package:
                 if so.client_order_ref:
                     worksheet.write(row, 0, so.client_order_ref, table_cell_format)
