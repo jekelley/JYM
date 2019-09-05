@@ -49,32 +49,41 @@ class DoRelease(models.Model):
         #     {'bold': False, 'align': 'left', 'font_size': 10})
         table_cell_format = xlwt.easyxf("font: bold off;")
 
+        row += 1
         for do in aggregate_order.x_studio_delivery_orders:
             so = self.env['sale.order'].search(
                 [('name', '=', do.group_id.name)])
 
             # do_line_id = do.move_ids_without_package[0]
-            row += 1
+           
             for line in do.move_ids_without_package:
-                worksheet.write(row, 0, so.client_order_ref, table_cell_format)
+                if so.client_order_ref:
+                    worksheet.write(row, 0, so.client_order_ref, table_cell_format)
                 worksheet.write(row, 1, so.name, table_cell_format)
                 worksheet.write(row, 2, so.partner_id.name, table_cell_format)
                 worksheet.write(row, 3, so.partner_id.street,
                                 table_cell_format)
-                worksheet.write(row, 4, so.partner_id.street2,
+                if so.partner_id.street2:
+                    worksheet.write(row, 4, so.partner_id.street2,
+
                                 table_cell_format)
                 worksheet.write(row, 5, so.partner_id.city, table_cell_format)
                 worksheet.write(row, 6, so.partner_id.state_id.name,
                                 table_cell_format)
                 worksheet.write(row, 7, so.partner_id.zip, table_cell_format)
-                worksheet.write(row, 8, so.partner_id.ref, table_cell_format)
+
+                if so.partner_id.ref:
+                    worksheet.write(row, 8, so.partner_id.ref, table_cell_format)
 
                 product = line.product_id
-                worksheet.write(row, 9, product.default_code,
+                if product.default_code:
+                    worksheet.write(row, 9, product.default_code,
                                 table_cell_format)
                 worksheet.write(row, 10, product.name,
                                 table_cell_format)
-                worksheet.write(row, 11,
+                if product.description:
+                    worksheet.write(row, 11,
+
                                 product.description,
                                 table_cell_format)
 
@@ -85,7 +94,10 @@ class DoRelease(models.Model):
                 worksheet.write(row, 12, part_number, table_cell_format)
                 worksheet.write(row, 13, line.product_uom_qty,
                                 table_cell_format)
-                worksheet.write(row, 14, line.active_move_line_ids and
+
+                if line.active_move_line_ids and line.active_move_line_ids.lot_id.name:
+                    worksheet.write(row, 14, line.active_move_line_ids and
+
                                 line.active_move_line_ids.lot_id.name,
                                 table_cell_format)
 
@@ -106,7 +118,9 @@ class DoRelease(models.Model):
                                 table_cell_format)
                 worksheet.write(row, 20, aggregate_order.x_studio_nb_of_pallets,
                                 table_cell_format)
-                worksheet.write(row, 21, aggregate_order.x_studio_arn,
+                if aggregate_order.x_studio_arn:
+                    worksheet.write(row, 21, aggregate_order.x_studio_arn,
+
                                 table_cell_format)
                 worksheet.write(row, 22, aggregate_order.x_name,
                                 table_cell_format)
