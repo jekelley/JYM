@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+            string="Inv - Activity FG Report"
+            id="action_report_inv_activity_finish_goods"
+            model="wizard.inv.finish.goods"
+            report_type="qweb-pdf"
+            name="inventory_reporting.report_inv_activity_finish_goods"
+            file="inventory_reporting.report_inv_activity_finish_goods"
+        />
+    </data>
+</odoo>
