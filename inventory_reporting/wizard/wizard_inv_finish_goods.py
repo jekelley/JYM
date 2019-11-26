@@ -148,15 +148,24 @@ class InvFGReport(models.TransientModel):
                 self.product_id, self.date_start, self.date_end)
             if rec:
                 data_dict.update({self.product_id: rec})
+        elif self.item_categ:
+            product_ids = self.env['product.product'].search(
+                [('categ_id', '=', self.item_categ.id)])
+            for product in product_ids:
+                rec = self.get_data_dict(
+                    product, self.date_start, self.date_end)
+                if rec:
+                    data_dict.update({product:rec})
         else:
-            if self.item_categ:
+            category_ids = self.env['product.category'].search([])
+            for categ_id in category_ids:
                 product_ids = self.env['product.product'].search(
-                    [('categ_id', '=', self.item_categ.id)])
+                    [('categ_id', '=', categ_id.id)])
                 for product in product_ids:
                     rec = self.get_data_dict(
                         product, self.date_start, self.date_end)
                     if rec:
-                        data_dict.update({product:rec})
+                        data_dict.update({product: rec})
 
         header_str = [
             'Manufacturing Order', 'Sales Order', 'Sales Order Date',

@@ -23,14 +23,23 @@ class ReportInvActivityFG(models.AbstractModel):
                 product_id, data['form']['date_start'], data['form']['date_end'])
             if rec:
                 data_dict.update({product_id: rec})
+        elif data['form']['item_categ']:
+            product_ids = self.env['product.product'].search([('categ_id', '=', data['form']['item_categ'][0])])
+            for product in product_ids:
+                rec = self.env['wizard.inv.finish.goods'].get_data_dict(
+                    product, data['form']['date_start'], data['form']['date_end'])
+                if rec:
+                    data_dict.update({product:rec})
         else:
-            if data['form']['item_categ']:
-                product_ids = self.env['product.product'].search([('categ_id', '=', data['form']['item_categ'][0])])
+            category_ids = self.env['product.category'].search([])
+            for categ_id in category_ids:
+                product_ids = self.env['product.product'].search(
+                    [('categ_id', '=', categ_id.id)])
                 for product in product_ids:
                     rec = self.env['wizard.inv.finish.goods'].get_data_dict(
                         product, data['form']['date_start'], data['form']['date_end'])
                     if rec:
-                        data_dict.update({product:rec})
+                        data_dict.update({product: rec})
 
         data.update({'inv_data': data_dict})
         return {

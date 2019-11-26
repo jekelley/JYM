@@ -35,7 +35,7 @@
                                     <t t-if="inv.qty_available &lt; 0">
                                         <td class="text-right" style="color:red;">(<span t-esc="abs(inv.qty_available)"/>)</td>
                                     </t>
-                                    <t t-if="inv.qty_available &gt; 0">
+                                    <t t-if="inv.qty_available &gt; 0 or inv.qty_available == 0.0">
                                         <td class="text-right"><span t-esc="inv.qty_available"/></td>
                                     </t>
                                     <td></td>
@@ -51,7 +51,7 @@
                                         <t t-if="rec['avail_inv'] &lt; 0">
                                             <td class="text-right" style="color:red;">(<span t-esc="abs(rec['avail_inv'])"/>)</td>
                                         </t>
-                                        <t t-if="rec['avail_inv'] &gt; 0">
+                                        <t t-if="rec['avail_inv'] &gt; 0 or inv.qty_available == 0.0">
                                             <td class="text-right"><span t-esc="rec['avail_inv']"/></td>
                                         </t>
                                         <td><span t-esc="rec['partner_name']"/></td>
