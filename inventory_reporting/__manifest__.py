@@ -11,8 +11,8 @@
     'license': 'AGPL-3',
     'depends': ['sale', 'stock'],
     'data': [
-        'wizard/wizard_inv_finish_goods_view.xml',
-        'report/inv_activity_finish_goods_template.xml',
+        'wizard/wizard_inv_activity_report_view.xml',
+        'report/inv_activity_report_template.xml',
         'report/inv_report_views.xml'
     ],
     'installable': True,

@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="report_inv_activity_finish_goods">
+    <template id="report_inv_activity_reports">
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
                 <div class="page">
                     <div class="text-center">
-                        <h2>Inventory Activity Report - Finished Goods</h2>
+                        <t t-if="data['context']['report_context'] == 'finish_goods'">
+                            <h2>Inventory Activity Report - Finished Goods</h2>
+                        </t>
+                        <t t-if="data['context']['report_context'] == 'activity_component'">
+                            <h2>Inventory Activity Report - Components</h2>
+                        </t>
                     </div>
                     <t t-foreach="data['inv_data']" t-as="inv">
                         <br/>
@@ -14,9 +19,16 @@
                         <table class="table table-condensed">
                             <thead>
                                 <tr>
-                                    <th>Manufacturing Order</th>
-                                    <th>Sales Order</th>
-                                    <th>Sales Order Date</th>
+                                    <t t-if="data['context']['report_context'] == 'finish_goods'">
+                                        <th>Manufacturing Order</th>
+                                        <th>Sales Order</th>
+                                        <th>Sales Order Date</th>
+                                    </t>
+                                    <t t-if="data['context']['report_context'] == 'activity_component'">
+                                        <th>Purchase Order</th>
+                                        <th>Manufacturing Order</th>
+                                        <th>Purchase Order Date</th>
+                                    </t>
                                     <th>Expected Date</th>
                                     <th>Qty In</th>
                                     <th>Qty Out</th>
@@ -42,9 +54,16 @@
                                 </tr>
                                 <t t-foreach="data['inv_data'][inv]" t-as="rec">
                                     <tr>
-                                        <td><span t-esc="rec['mo_name']"/></td>
-                                        <td><span t-esc="rec['so_name']"/></td>
-                                        <td><span t-esc="rec['so_date']"/></td>
+                                        <t t-if="data['context']['report_context'] == 'finish_goods'">
+                                            <td><span t-esc="rec['mo_name']"/></td>
+                                            <td><span t-esc="rec['so_name']"/></td>
+                                            <td><span t-esc="rec['so_date']"/></td>
+                                        </t>
+                                        <t t-if="data['context']['report_context'] == 'activity_component'">
+                                            <td><span t-esc="rec['po_name']"/></td>
+                                            <td><span t-esc="rec['mo_name']"/></td>
+                                            <td><span t-esc="rec['po_date']"/></td>
+                                        </t>
                                         <td><span t-esc="rec['expected_date']"/></td>
                                         <td class="text-right"><span t-esc="rec['qty_in']"/></td>
                                         <td class="text-right"><span t-esc="rec['qty_out']"/></td>

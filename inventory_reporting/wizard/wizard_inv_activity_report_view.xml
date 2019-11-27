@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="view_wizard_inv_finish_goods_form" model="ir.ui.view">
-        <field name="name">wizard.inv.finish.goods.form</field>
-        <field name="model">wizard.inv.finish.goods</field>
+    <record id="view_wizard_inv_activity_report_form" model="ir.ui.view">
+        <field name="name">wizard.inv.activity.reports.form</field>
+        <field name="model">wizard.inv.activity.reports</field>
         <field name="type">form</field>
         <field name="priority" eval="8"/>
         <field name="arch" type="xml">
             <form string="INV FG Report">
-
                 <group>
                     <group>
                         <field name="date_start" required="1"/>
@@ -33,12 +32,25 @@
     </record>
     <record model="ir.actions.act_window"
             id="action_wizard_inv_finish_goods_view">
-        <field name="name">INV FG Report</field>
+        <field name="name">Activity FG Report</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">wizard.inv.finish.goods</field>
+        <field name="res_model">wizard.inv.activity.reports</field>
         <field name="view_type">form</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="view_wizard_inv_finish_goods_form"/>
+        <field name="view_id" ref="view_wizard_inv_activity_report_form"/>
+        <field name="context">{'report_context': 'finish_goods'}</field>
+        <field name="target">new</field>
+    </record>
+
+    <record model="ir.actions.act_window"
+            id="action_wizard_inv_act_comp_view">
+        <field name="name">Activity Component Report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">wizard.inv.activity.reports</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_wizard_inv_activity_report_form"/>
+        <field name="context">{'report_context': 'activity_component'}</field>
         <field name="target">new</field>
     </record>
 
@@ -49,6 +61,11 @@
     <menuitem id="menu_inv_finish_good_report"
               name="Inv Finish Good Report"
               action="action_wizard_inv_finish_goods_view"
-              parent="menu_inv_report"/>
+              parent="menu_inv_report" sequence="1"/>
+
+    <menuitem id="menu_inv_act_comp_report"
+              name="Inv Activity Component Report"
+              action="action_wizard_inv_act_comp_view"
+              parent="menu_inv_report" sequence="2"/>
 
 </odoo>
