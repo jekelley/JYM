@@ -45,6 +45,7 @@ class InvActivityReport(models.TransientModel):
             ('x_studio_stage_expected_date', '>=', date_start),
             ('x_studio_stage_expected_date', '<=', date_end)
         ]).ids
+
         if not order_ids:
             order_ids = [0]
         if not mrp_ids:
@@ -165,9 +166,11 @@ class InvActivityReport(models.TransientModel):
                                 'avail_inv': total,
                                 'partner_name': line.order_id.partner_id.name})
             cnt +=1
+
         return report_data_list
 
-    def print_excel_report(self, report_context):
+    @api.multi
+    def print_excel_report(self):
         # Method to print excel report
         if not self.date_end:
             self.date_end = fields.Date.today()
@@ -187,6 +190,7 @@ class InvActivityReport(models.TransientModel):
         red = workbook.add_format(
             {'font_color': 'red', 'align': 'right'})
 
+        report_context = self.env.context.get('report_context')
         if report_context == 'finish_goods':
             worksheet = workbook.add_worksheet('Inv - Activity FG')
             worksheet.merge_range(
