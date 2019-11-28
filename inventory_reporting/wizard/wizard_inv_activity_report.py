@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
 from io import BytesIO
-from datetime import datetime
+from datetime import datetime, timedelta
 from odoo.exceptions import UserError
 import xlsxwriter
+import base64
 
 
 class InvActivityReport(models.TransientModel):
     _name = 'wizard.inv.activity.reports'
     _description = 'Report for Inventory Activity Report'
 
-    date_start = fields.Date(string='Start Date')
-    date_end = fields.Date(string='End Date', default=fields.Date.today)
+    date_start = fields.Date(string='Start Date', default=fields.Date.today)
+    date_end = fields.Date(string='End Date')
     product_id = fields.Many2one('product.product', string='SKU')
     item_categ = fields.Many2one('product.category', string='Item Category')
 
@@ -20,40 +21,27 @@ class InvActivityReport(models.TransientModel):
          'Start date must be smaller than end date'),
     ]
 
-    @api.multi
-    def print_excel_report(self):
-        if self.product_id:
-            if self.item_categ and self.product_id.categ_id.id != self.item_categ.id:
-                raise UserError(_(
-                    'The selected product category does not match with the selected category.'))
-        if self.env.context.get('report_context'):
-            return {
-                'type': 'ir.actions.act_url',
-                'url': '/inv_activity_reports/%s/%s' % (
-                    self.id, str(self.env.context.get('report_context'))),
-                'target': 'new',
-            }
-
     def get_data_dict(self, product_id, date_start, date_end, report_context):
         # Method to get dictionary of sale order, purchase order and manufacturing order
         if report_context == 'finish_goods':
+            st_dt = fields.Datetime.from_string(date_start)
+            end_dt = fields.Datetime.from_string(date_end)+timedelta(days=1)
             order_ids = self.env['sale.order.line'].search(
                 [('product_id', '=', product_id.id),
-                 ('order_id.state', 'in', ['sale', 'done']),
-                 ('order_id.commitment_date', '>=', date_start),
-                 ('order_id.commitment_date', '<=', date_end)]).mapped(
+                 ('order_id.state', '=', 'sale'),
+                 ('order_id.commitment_date', '>=', st_dt),
+                 ('order_id.commitment_date', '<', end_dt)]).mapped(
                 'order_id').ids
         else:
             order_ids = self.env['purchase.order.line'].search(
                 [('product_id', '=', product_id.id),
-                 ('order_id.state', 'in', ['purchase', 'done']),
+                 ('order_id.state', '=', 'purchase'),
                  ('order_id.x_studio_requested_ship_date', '>=', date_start),
-                 ('order_id.x_studio_requested_ship_date', '<=',
-                  date_end)]).mapped(
-                'order_id').ids
+                 ('order_id.x_studio_requested_ship_date', '<=', date_end)]
+            ).mapped('order_id').ids
         mrp_ids = self.env['mrp.production'].search([
             ('product_id', '=', product_id.id),
-            ('state', 'in', ['progress', 'done']),
+            ('state', '=', 'progress'),
             ('x_studio_stage_expected_date', '>=', date_start),
             ('x_studio_stage_expected_date', '<=', date_end)
         ]).ids
@@ -163,7 +151,7 @@ class InvActivityReport(models.TransientModel):
                             if line.order_id.date_order:
                                 date_order = datetime.strptime(
                                     str(line.order_id.date_order),
-                                    '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
+                                    '%Y-%m-%d %H:%M:%S').strftime('%m/%d/%Y')
                             if line.order_id.x_studio_requested_ship_date:
                                 expected_date = datetime.strptime(
                                     str(
@@ -179,7 +167,7 @@ class InvActivityReport(models.TransientModel):
             cnt +=1
         return report_data_list
 
-    def print_inv_excel_report(self, report_context):
+    def print_excel_report(self, report_context):
         # Method to print excel report
         if not self.date_end:
             self.date_end = fields.Date.today()
@@ -229,11 +217,16 @@ class InvActivityReport(models.TransientModel):
 
         data_dict = {}
         if self.product_id:
+            if self.item_categ and self.product_id.categ_id.id != self.item_categ.id:
+                raise UserError(_(
+                    'The selected product category does not match with the selected category.'))
             rec = self.get_data_dict(
                 self.product_id, self.date_start, self.date_end,
                 report_context)
             if rec:
                 data_dict.update({self.product_id: rec})
+            else:
+                raise UserError(_('No records found'))
         elif self.item_categ:
             product_ids = self.env['product.product'].search(
                 [('categ_id', '=', self.item_categ.id)])
@@ -242,6 +235,8 @@ class InvActivityReport(models.TransientModel):
                     product, self.date_start, self.date_end, report_context)
                 if rec:
                     data_dict.update({product: rec})
+                else:
+                    raise UserError(_('No records found'))
         else:
             category_ids = self.env['product.category'].search([])
             for categ_id in category_ids:
@@ -253,7 +248,6 @@ class InvActivityReport(models.TransientModel):
                         report_context)
                     if rec:
                         data_dict.update({product: rec})
-
         for product_id in data_dict:
             row += 2
             worksheet.set_row(row, 20)
@@ -295,7 +289,30 @@ class InvActivityReport(models.TransientModel):
                 worksheet.write(row, col + 7, data.get('partner_name'))
 
         workbook.close()
-        return fp.getvalue()
+        fp.seek(0)
+        result = base64.b64encode(fp.read())
+        attachment_obj = self.env['ir.attachment']
+
+        if report_context == 'finish_goods':
+            filename = 'Inventory Activity FG'
+        else:
+            filename = 'Inventory Activity Component'
+
+        attachment_id = attachment_obj.create(
+            {'name': filename,
+             'datas_fname': 'Activity Report',
+             'datas': result})
+
+        download_url = '/web/content/' + \
+                       str(attachment_id.id) + '?download=True'
+        base_url = self.env['ir.config_parameter'].sudo(
+        ).get_param('web.base.url')
+        return {
+            "type": "ir.actions.act_url",
+            "url": str(base_url) + str(download_url),
+            "target": "new",
+            'nodestroy': False,
+        }
 
     def print_inv_pdf_report(self):
         # Method to print pdf report
@@ -304,6 +321,11 @@ class InvActivityReport(models.TransientModel):
         data['ids'] = self.env.context.get('active_ids', [])
         data['form'] = self.read(['date_start', 'date_end', 'product_id',
                                   'item_categ'])[0]
-        return self.env.ref(
-            'inventory_reporting.action_report_inv_activity_report'
-        ).report_action(self, data=data)
+        if self.env.context.get('report_context') == 'finish_goods':
+            return self.env.ref(
+                'inventory_reporting.action_report_inv_activity_finish_goods_report'
+            ).report_action(self, data=data)
+        else:
+            return self.env.ref(
+                'inventory_reporting.action_report_inv_activity_component_report'
+            ).report_action(self, data=data)

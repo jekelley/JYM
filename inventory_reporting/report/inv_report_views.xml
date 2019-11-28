@@ -2,12 +2,20 @@
 <odoo>
     <data>
         <report
-            string="Inv - Activity FG Report"
-            id="action_report_inv_activity_report"
-            model="wizard.inv.activity.reports"
-            report_type="qweb-pdf"
-            name="inventory_reporting.report_inv_activity_reports"
-            file="inventory_reporting.report_inv_activity_reports"
+                string="Inv - Activity FG Report"
+                id="action_report_inv_activity_finish_goods_report"
+                model="wizard.inv.activity.reports"
+                report_type="qweb-pdf"
+                name="inventory_reporting.report_inv_activity_reports"
+                file="inventory_reporting.report_inv_activity_reports"
+        />
+        <report
+                string="Inv - Activity Component Report"
+                id="action_report_inv_activity_component_report"
+                model="wizard.inv.activity.reports"
+                report_type="qweb-pdf"
+                name="inventory_reporting.report_inv_activity_reports"
+                file="inventory_reporting.report_inv_activity_reports"
         />
     </data>
 </odoo>
