@@ -17,6 +17,14 @@
                 name="inventory_reporting.report_component_reports"
                 file="inventory_reporting.report_component_reports"
         />
+        <report
+            id="action_report_so_open_order"
+            string="SO Open Order"
+            model="sale.order"
+            report_type="qweb-pdf"
+            file="inventory_reporting.report_so_open_order"
+            name="inventory_reporting.report_so_open_order"
+        />
 
     </data>
 </odoo>

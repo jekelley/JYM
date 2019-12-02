@@ -15,7 +15,9 @@
         'wizard/wizard_component_report.xml',
         'report/inv_activity_finish_good_report_template.xml',
         'report/inv_activity_component_report_template.xml',
-        'report/inv_report_views.xml'
+        'report/so_open_order_report_template.xml',
+        'report/inv_report_views.xml',
+        'views/sale_order_view.xml',
     ],
     'installable': True,
     'application': True,
