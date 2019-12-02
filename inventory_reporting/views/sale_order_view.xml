@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--print_report method is called from server action-->
+    <record id="action_sale_report" model="ir.actions.server">
+        <field name="name">Sale Report</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.print_report()
+        </field>
+    </record>
+
+    <!--Menu to Print Sale Report-->
+    <menuitem id="menu_sale_report" name="Print Sale Report"
+              parent="sale.menu_sale_report" sequence="110" action="action_sale_report"/>
+</odoo>

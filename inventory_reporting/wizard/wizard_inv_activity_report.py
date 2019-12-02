@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models, _
-from io import BytesIO
-from datetime import datetime, timedelta
-from odoo.exceptions import UserError
-import xlsxwriter
 import base64
+from datetime import datetime, timedelta
+from io import BytesIO
+import xlsxwriter
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 
 class InvActivityReport(models.TransientModel):
@@ -22,26 +22,27 @@ class InvActivityReport(models.TransientModel):
     ]
 
     def get_data_dict(self, product_id, date_start, date_end, report_context):
-        # Method to get dictionary of sale order, purchase order and manufacturing order
+        # Method to get dictionary of sale order, purchase order and
+        # manufacturing order
         if report_context == 'finish_goods':
             st_dt = fields.Datetime.from_string(date_start)
-            end_dt = fields.Datetime.from_string(date_end)+timedelta(days=1)
+            end_dt = fields.Datetime.from_string(date_end) + timedelta(days=1)
             order_ids = self.env['sale.order.line'].search(
                 [('product_id', '=', product_id.id),
-                 ('order_id.state', '=', 'sale'),
+                 ('order_id.state', 'in', ['draft', 'sent']),
                  ('order_id.commitment_date', '>=', st_dt),
                  ('order_id.commitment_date', '<', end_dt)]).mapped(
                 'order_id').ids
         else:
             order_ids = self.env['purchase.order.line'].search(
                 [('product_id', '=', product_id.id),
-                 ('order_id.state', '=', 'purchase'),
+                 ('order_id.state', 'in', ['draft','sent','to approve', 'purchase']),
                  ('order_id.x_studio_requested_ship_date', '>=', date_start),
                  ('order_id.x_studio_requested_ship_date', '<=', date_end)]
             ).mapped('order_id').ids
         mrp_ids = self.env['mrp.production'].search([
             ('product_id', '=', product_id.id),
-            ('state', '=', 'progress'),
+            ('state', 'in', ['confirmed','planned','progress']),
             ('x_studio_stage_expected_date', '>=', date_start),
             ('x_studio_stage_expected_date', '<=', date_end)
         ]).ids
@@ -59,7 +60,8 @@ class InvActivityReport(models.TransientModel):
                         where id in %s
                         UNION
                         SELECT ord.id, ord.name as name, 
-                        ord.x_studio_completed_date as expected_date from sale_order as ord
+                        ord.commitment_date as expected_date 
+                        from sale_order as ord
                         where id in %s
                         order by expected_date"""
         else:
@@ -70,7 +72,8 @@ class InvActivityReport(models.TransientModel):
                         where id in %s
                         UNION
                         SELECT ord.id, ord.name as name, 
-                        ord.x_studio_purchasing_order_date as expected_date from purchase_order as ord
+                        ord.x_studio_requested_ship_date as expected_date 
+                        from purchase_order as ord
                         where id in %s
                         order by expected_date"""
 
@@ -95,18 +98,22 @@ class InvActivityReport(models.TransientModel):
                         total += mrp_id.product_qty
                     if mrp_id.x_studio_stage_expected_date:
                         expected_date = datetime.strptime(
-                            str(mrp_id.x_studio_stage_expected_date),'%Y-%m-%d').strftime(
-                            '%d/%m/%Y')
-                    report_data_list.append({'mo_name': mrp_id.name, 'so_name': '', 'so_date': '',
-                         'expected_date': expected_date, 'qty_in': mrp_id.product_qty,
-                         'qty_out': '', 'avail_inv': total, 'partner_name': ''})
+                            str(mrp_id.x_studio_stage_expected_date),
+                            '%Y-%m-%d').strftime('%d/%m/%Y')
+                    report_data_list.append(
+                        {'mo_name': mrp_id.name, 'so_name': '', 'so_date': '',
+                         'expected_date': expected_date,
+                         'qty_in': mrp_id.product_qty,
+                         'qty_out': '', 'avail_inv': total,
+                         'partner_name': ''})
                 else:
                     for line in sale_id.order_line:
                         if line.product_id == product_id:
                             if cnt == 1:
-                                total = product_id.qty_available - line.qty_delivered
+                                total = product_id.qty_available - \
+                                        line.product_uom_qty
                             else:
-                                total -= line.qty_delivered
+                                total -= line.product_uom_qty
                             confirmation_date = ''
                             if line.order_id.confirmation_date:
                                 confirmation_date = datetime.strptime(
@@ -114,12 +121,13 @@ class InvActivityReport(models.TransientModel):
                                     '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
                             if line.order_id.commitment_date:
                                 expected_date = datetime.strptime(
-                                    str(line.order_id.commitment_date),'%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
+                                    str(line.order_id.commitment_date),
+                                    '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
                             report_data_list.append({
                                 'mo_name': '', 'so_name': line.order_id.name,
                                 'so_date': confirmation_date,
                                 'expected_date': expected_date,
-                                'qty_in': '', 'qty_out': line.qty_delivered,
+                                'qty_in': '', 'qty_out': line.product_uom_qty,
                                 'avail_inv': total,
                                 'partner_name': line.order_id.partner_id.name})
             else:
@@ -133,8 +141,7 @@ class InvActivityReport(models.TransientModel):
                     if mrp_id.x_studio_stage_expected_date:
                         expected_date = datetime.strptime(
                             str(mrp_id.x_studio_stage_expected_date),
-                            '%Y-%m-%d').strftime(
-                            '%d/%m/%Y')
+                            '%Y-%m-%d').strftime('%d/%m/%Y')
                     report_data_list.append(
                         {'mo_name': mrp_id.name, 'po_name': '', 'po_date': '',
                          'expected_date': expected_date,
@@ -145,9 +152,10 @@ class InvActivityReport(models.TransientModel):
                     for line in purchase_id.order_line:
                         if line.product_id == product_id:
                             if cnt == 1:
-                                total = product_id.qty_available + line.qty_received
+                                total = product_id.qty_available + \
+                                        line.product_qty
                             else:
-                                total += line.qty_received
+                                total += line.product_qty
                             date_order = ''
                             if line.order_id.date_order:
                                 date_order = datetime.strptime(
@@ -155,32 +163,30 @@ class InvActivityReport(models.TransientModel):
                                     '%Y-%m-%d %H:%M:%S').strftime('%m/%d/%Y')
                             if line.order_id.x_studio_requested_ship_date:
                                 expected_date = datetime.strptime(
-                                    str(
-                                        line.order_id.x_studio_requested_ship_date),
+                                    str(line.order_id.x_studio_requested_ship_date),
                                     '%Y-%m-%d').strftime('%d/%m/%Y')
                             report_data_list.append({
                                 'mo_name': '', 'po_name': line.order_id.name,
                                 'po_date': date_order,
                                 'expected_date': expected_date,
-                                'qty_in': line.qty_received, 'qty_out': '',
+                                'qty_in': line.product_qty, 'qty_out': '',
                                 'avail_inv': total,
                                 'partner_name': line.order_id.partner_id.name})
-            cnt +=1
-
+            cnt += 1
         return report_data_list
 
     @api.multi
     def print_excel_report(self):
         # Method to print excel report
         if not self.date_end:
-            self.date_end = fields.Date.today()
+            date_end = fields.Date.today()
 
         fp = BytesIO()
         workbook = xlsxwriter.Workbook(fp)
         title_format = workbook.add_format(
             {'font_name': 'Calibri', 'font_size': 11, 'align': 'center'})
         header_format = workbook.add_format(
-            {'font_name': 'Calibri', 'font_size': 15, 'bold': 1,
+            {'font_name': 'Calibri', 'font_size': 12, 'bold': 1,
              'align': 'center'})
         row_header_format = workbook.add_format(
             {'font_name': 'Calibri', 'font_size': 11, 'bold': 1,
@@ -221,12 +227,13 @@ class InvActivityReport(models.TransientModel):
 
         data_dict = {}
         if self.product_id:
-            if self.item_categ and self.product_id.categ_id.id != self.item_categ.id:
+            if self.item_categ and \
+                    self.product_id.categ_id.id != self.item_categ.id:
                 raise UserError(_(
-                    'The selected product category does not match with the selected category.'))
+                    'The selected product category does not match with the '
+                    'selected category.'))
             rec = self.get_data_dict(
-                self.product_id, self.date_start, self.date_end,
-                report_context)
+                self.product_id, self.date_start, date_end, report_context)
             if rec:
                 data_dict.update({self.product_id: rec})
             else:
@@ -236,11 +243,11 @@ class InvActivityReport(models.TransientModel):
                 [('categ_id', '=', self.item_categ.id)])
             for product in product_ids:
                 rec = self.get_data_dict(
-                    product, self.date_start, self.date_end, report_context)
+                    product, self.date_start, date_end, report_context)
                 if rec:
                     data_dict.update({product: rec})
-                else:
-                    raise UserError(_('No records found'))
+            if not data_dict:
+                raise UserError(_('No records found'))
         else:
             category_ids = self.env['product.category'].search([])
             for categ_id in category_ids:
@@ -248,10 +255,11 @@ class InvActivityReport(models.TransientModel):
                     [('categ_id', '=', categ_id.id)])
                 for product in product_ids:
                     rec = self.get_data_dict(
-                        product, self.date_start, self.date_end,
-                        report_context)
+                        product, self.date_start, date_end, report_context)
                     if rec:
                         data_dict.update({product: rec})
+            if not data_dict:
+                raise UserError(_('No records found'))
         for product_id in data_dict:
             row += 2
             worksheet.set_row(row, 20)
@@ -304,7 +312,7 @@ class InvActivityReport(models.TransientModel):
 
         attachment_id = attachment_obj.create(
             {'name': filename,
-             'datas_fname': 'Activity Report',
+             'datas_fname': filename,
              'datas': result})
 
         download_url = '/web/content/' + \
@@ -317,19 +325,3 @@ class InvActivityReport(models.TransientModel):
             "target": "new",
             'nodestroy': False,
         }
-
-    def print_inv_pdf_report(self):
-        # Method to print pdf report
-        self.ensure_one()
-        data = {}
-        data['ids'] = self.env.context.get('active_ids', [])
-        data['form'] = self.read(['date_start', 'date_end', 'product_id',
-                                  'item_categ'])[0]
-        if self.env.context.get('report_context') == 'finish_goods':
-            return self.env.ref(
-                'inventory_reporting.action_report_inv_activity_finish_goods_report'
-            ).report_action(self, data=data)
-        else:
-            return self.env.ref(
-                'inventory_reporting.action_report_inv_activity_component_report'
-            ).report_action(self, data=data)

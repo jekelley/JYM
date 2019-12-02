@@ -9,10 +9,12 @@
     'summary': """Generates PDF and Excel report""",
     'description': """Generates PDF and Excel report""",
     'license': 'AGPL-3',
-    'depends': ['sale', 'stock'],
+    'depends': ['sale', 'stock', 'mrp'],
     'data': [
-        'wizard/wizard_inv_activity_report_view.xml',
-        'report/inv_activity_report_template.xml',
+        'wizard/wizard_fg_report.xml',
+        'wizard/wizard_component_report.xml',
+        'report/inv_activity_finish_good_report_template.xml',
+        'report/inv_activity_component_report_template.xml',
         'report/inv_report_views.xml'
     ],
     'installable': True,
