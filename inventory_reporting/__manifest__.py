@@ -16,6 +16,7 @@
         'report/inv_activity_finish_good_report_template.xml',
         'report/inv_activity_component_report_template.xml',
         'report/so_open_order_report_template.xml',
+        'report/so_line_item_report_template.xml',
         'report/inv_report_views.xml',
         'views/sale_order_view.xml',
     ],
