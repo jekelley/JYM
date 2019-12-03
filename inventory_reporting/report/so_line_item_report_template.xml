@@ -46,7 +46,7 @@
                                                 <span t-esc="line['order_qty']"/>
                                             </td>
                                             <td class="text-right">
-                                                <span t-esc="line['rate']"/>
+                                                <span t-esc="line['unit_price']"/>
                                             </td>
                                             <td class="text-right">
                                                 <span t-esc="line['discount']"/>

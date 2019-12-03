@@ -9,8 +9,6 @@ class ReportInvActivityComponentReports(models.AbstractModel):
     @api.model
     def _get_report_values(self, docids, data=None):
         data_dict = {}
-        if not data['form']['date_end']:
-            data['form']['date_end'] = fields.Date.today()
 
         if data['form']['product_id']:
             product_id = self.env['product.product'].browse(

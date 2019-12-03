@@ -14,7 +14,7 @@ class SaleOrder(models.Model):
     def get_open_order(self):
         # Returns dictionary of sale order data
         data_list = []
-        order_ids = self.search([('state', 'in', ['draft', 'sent', 'sale'])])
+        order_ids = self.search([('state', '=', 'sale')])
         for order in order_ids:
             report_data_list = []
             for line in order.order_line:
@@ -31,10 +31,9 @@ class SaleOrder(models.Model):
                         '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
                 report_data_list.append(
                     {'order': line.order_id, 'name': line.product_id.name,
-                     'description': line.name,
-                     'req_date': expected_date,
-                     'order_date': confirmation_date, 'rate': line.price_unit,
-                     'discount': line.discount,
+                     'description': line.name, 'req_date': expected_date,
+                     'order_date': confirmation_date,
+                     'unit_price': line.price_unit, 'discount': line.discount,
                      'product_uom': line.product_uom.name,
                      'order_qty': line.product_uom_qty,
                      'ship_qty': line.qty_delivered,
@@ -46,7 +45,7 @@ class SaleOrder(models.Model):
     @api.multi
     def print_report(self):
         # Method to print sale order open order report
-        sale_ids = self.search([('state', 'in', ['draft', 'sent'])], limit=1)
+        sale_ids = self.search([('state', '=', 'sale')], limit=1)
         if not sale_ids:
             raise UserError(_('No records found'))
         else:
@@ -153,7 +152,7 @@ class SaleOrder(models.Model):
     @api.multi
     def print_line_item_report(self):
         # Method to print sale order line item report
-        sale_ids = self.search([('state', 'in', ['draft', 'sent'])], limit=1)
+        sale_ids = self.search([('state', '=', 'sale')], limit=1)
         if not sale_ids:
             raise UserError(_('No records found'))
         else:
@@ -213,7 +212,7 @@ class SaleOrder(models.Model):
                     worksheet.write(row, col + 4, lines.get('product_uom'))
                     worksheet.write(row, col + 5, lines.get('order_qty'),
                                     align_right)
-                    worksheet.write(row, col + 6, lines.get('rate'),
+                    worksheet.write(row, col + 6, lines.get('unit_price'),
                                     align_right)
                     worksheet.write(row, col + 7, lines.get('discount'),
                                     align_right)

@@ -2,6 +2,7 @@
 import base64
 from datetime import datetime, timedelta
 from io import BytesIO
+
 import xlsxwriter
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -26,27 +27,32 @@ class InvActivityReport(models.TransientModel):
         # manufacturing order
         if report_context == 'finish_goods':
             st_dt = fields.Datetime.from_string(date_start)
-            end_dt = fields.Datetime.from_string(date_end) + timedelta(days=1)
-            order_ids = self.env['sale.order.line'].search(
-                [('product_id', '=', product_id.id),
-                 ('order_id.state', 'in', ['draft', 'sent']),
-                 ('order_id.commitment_date', '>=', st_dt),
-                 ('order_id.commitment_date', '<', end_dt)]).mapped(
+            domain = [('product_id', '=', product_id.id),
+                      ('order_id.state', '=', 'sale'),
+                      ('order_id.commitment_date', '>=', st_dt)]
+            if date_end:
+                end_dt = fields.Datetime.from_string(date_end) + timedelta(
+                    days=1)
+                domain.append(('order_id.commitment_date', '<', end_dt))
+            order_ids = self.env['sale.order.line'].search(domain).mapped(
                 'order_id').ids
         else:
+            domain = [('product_id', '=', product_id.id),
+                      ('order_id.state', '=', 'purchase'),
+                      ('order_id.x_studio_requested_ship_date', '>=',
+                       date_start)]
+            if date_end:
+                domain.append(
+                    ('order_id.x_studio_requested_ship_date', '<=', date_end))
             order_ids = self.env['purchase.order.line'].search(
-                [('product_id', '=', product_id.id),
-                 ('order_id.state', 'in', ['draft','sent','to approve', 'purchase']),
-                 ('order_id.x_studio_requested_ship_date', '>=', date_start),
-                 ('order_id.x_studio_requested_ship_date', '<=', date_end)]
-            ).mapped('order_id').ids
-        mrp_ids = self.env['mrp.production'].search([
-            ('product_id', '=', product_id.id),
-            ('state', 'in', ['confirmed','planned','progress']),
-            ('x_studio_stage_expected_date', '>=', date_start),
-            ('x_studio_stage_expected_date', '<=', date_end)
-        ]).ids
-
+                domain).mapped('order_id').ids
+        domain = [('product_id', '=', product_id.id),
+                  ('state', '!=', 'cancel'),
+                  ('x_studio_stage_expected_date', '>=', date_start)]
+        if date_end:
+            domain.append(
+                ('x_studio_stage_expected_date', '<=', date_end))
+        mrp_ids = self.env['mrp.production'].search(domain).ids
         if not order_ids:
             order_ids = [0]
         if not mrp_ids:
@@ -162,9 +168,9 @@ class InvActivityReport(models.TransientModel):
                                     str(line.order_id.date_order),
                                     '%Y-%m-%d %H:%M:%S').strftime('%m/%d/%Y')
                             if line.order_id.x_studio_requested_ship_date:
-                                expected_date = datetime.strptime(
-                                    str(line.order_id.x_studio_requested_ship_date),
-                                    '%Y-%m-%d').strftime('%d/%m/%Y')
+                                expected_date = datetime.strptime(str(
+                                    line.order_id.x_studio_requested_ship_date
+                                ), '%Y-%m-%d').strftime('%d/%m/%Y')
                             report_data_list.append({
                                 'mo_name': '', 'po_name': line.order_id.name,
                                 'po_date': date_order,
@@ -178,8 +184,6 @@ class InvActivityReport(models.TransientModel):
     @api.multi
     def print_excel_report(self):
         # Method to print excel report
-        if not self.date_end:
-            date_end = fields.Date.today()
 
         fp = BytesIO()
         workbook = xlsxwriter.Workbook(fp)
@@ -233,7 +237,8 @@ class InvActivityReport(models.TransientModel):
                     'The selected product category does not match with the '
                     'selected category.'))
             rec = self.get_data_dict(
-                self.product_id, self.date_start, date_end, report_context)
+                self.product_id, self.date_start, self.date_end,
+                report_context)
             if rec:
                 data_dict.update({self.product_id: rec})
             else:
@@ -243,7 +248,7 @@ class InvActivityReport(models.TransientModel):
                 [('categ_id', '=', self.item_categ.id)])
             for product in product_ids:
                 rec = self.get_data_dict(
-                    product, self.date_start, date_end, report_context)
+                    product, self.date_start, self.date_end, report_context)
                 if rec:
                     data_dict.update({product: rec})
             if not data_dict:
@@ -255,7 +260,8 @@ class InvActivityReport(models.TransientModel):
                     [('categ_id', '=', categ_id.id)])
                 for product in product_ids:
                     rec = self.get_data_dict(
-                        product, self.date_start, date_end, report_context)
+                        product, self.date_start, self.date_end,
+                        report_context)
                     if rec:
                         data_dict.update({product: rec})
             if not data_dict:

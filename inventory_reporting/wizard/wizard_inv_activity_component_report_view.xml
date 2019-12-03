@@ -19,7 +19,7 @@
                 </group>
 
                 <footer>
-                    <button string='Print PDF123' name="print_inv_pdf_report_component"
+                    <button string='Print PDF' name="print_inv_pdf_report_component"
                             type="object" class="btn-primary"/>
                     <button string='Print Excel' name="print_excel_report"
                             type="object" class="btn-primary"/>
