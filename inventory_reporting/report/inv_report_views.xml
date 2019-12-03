@@ -22,6 +22,7 @@
             string="SO Open Order"
             model="sale.order"
             report_type="qweb-pdf"
+            menu="False"
             file="inventory_reporting.report_so_open_order"
             name="inventory_reporting.report_so_open_order"
         />
@@ -30,8 +31,17 @@
             string="SO Line Item"
             model="sale.order"
             report_type="qweb-pdf"
+            menu="False"
             file="inventory_reporting.report_so_line_item"
             name="inventory_reporting.report_so_line_item"
+        />
+        <report
+            id="action_report_so_summary"
+            string="SO Summary"
+            model="wizard.so.summary"
+            report_type="qweb-pdf"
+            file="inventory_reporting.report_so_summary"
+            name="inventory_reporting.report_so_summary"
         />
     </data>
 </odoo>
