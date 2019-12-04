@@ -63,6 +63,7 @@ class SaleOrder(models.Model):
         header_format = workbook.add_format(
             {'font_name': 'Calibri', 'font_size': 12, 'bold': 1,
              'align': 'center'})
+        header_format.set_text_wrap()
         row_header_format = workbook.add_format(
             {'font_name': 'Calibri', 'font_size': 11, 'bold': 1,
              'align': 'center'})
@@ -95,7 +96,7 @@ class SaleOrder(models.Model):
         if data_list:
             for data in data_list:
                 row += 2
-                worksheet.set_row(row, 20)
+                worksheet.set_row(row, 28)
                 worksheet.write(
                     row, col, 'Sale Order Number - ' + data['order'].name,
                                 header_format)
@@ -173,7 +174,7 @@ class SaleOrder(models.Model):
         align_right = workbook.add_format(
             {'align': 'right'})
         row_format = workbook.add_format(
-            {'font_size': 10})
+            {'font_size': 11})
         row_format.set_text_wrap()
 
         worksheet = workbook.add_worksheet('SO - Line Item')
@@ -188,8 +189,8 @@ class SaleOrder(models.Model):
         worksheet.set_column('B:B', 30)
         worksheet.set_column('C:C', 15)
         worksheet.set_column('D:D', 15)
-        worksheet.set_column('E:E', 15)
-        worksheet.set_column('F:F', 15)
+        worksheet.set_column('G:G', 15)
+        worksheet.set_column('I:I', 15)
         row = 0
         col = 0
 

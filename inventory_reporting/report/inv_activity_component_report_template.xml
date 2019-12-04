@@ -72,8 +72,7 @@
                                         <t t-if="rec['avail_inv'] &lt; 0">
                                             <td class="text-right"
                                                 style="color:red;">(<span
-                                                    t-esc="abs(rec['avail_inv'])"/>
-                                                )
+                                                    t-esc="abs(rec['avail_inv'])"/>)
                                             </td>
                                         </t>
                                         <t t-if="rec['avail_inv'] &gt; 0 or rec['avail_inv'] == 0.0">
