@@ -30,16 +30,19 @@ class SaleOrder(models.Model):
                         str(line.order_id.commitment_date),
                         '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
                 report_data_list.append(
-                    {'order': line.order_id, 'name': line.product_id.name,
-                     'description': line.name, 'req_date': expected_date,
+                    {'order': line.order_id,
+                     'name': line.product_id.name,
+                     'description': line.name,
+                     'req_date': expected_date,
                      'order_date': confirmation_date,
-                     'unit_price': line.price_unit, 'discount': line.discount,
+                     'unit_price': line.price_unit,
+                     'discount': line.discount,
                      'product_uom': line.product_uom.name,
                      'order_qty': line.product_uom_qty,
                      'ship_qty': line.qty_delivered,
                      'on_hand': line.product_id.qty_available,
                      'open_qty': open_qty,
-                     'rate': currency_rate,
+                     'rate': line.order_id.currency_rate,
                      'total': line.price_subtotal})
             data_list.append({'order': order, 'lines': report_data_list})
         return data_list
