@@ -63,7 +63,7 @@
                                                 <span t-esc="line['rate']"/>
                                             </td>
                                             <td class="text-right">
-                                                <span t-esc="line['total']"/> 
+                                                <span t-esc="line['total']"/>
                                             </td>
                                         </tr>
                                     </t>
