@@ -38,7 +38,9 @@ class SaleOrder(models.Model):
                      'order_qty': line.product_uom_qty,
                      'ship_qty': line.qty_delivered,
                      'on_hand': line.product_id.qty_available,
-                     'open_qty': open_qty, 'total': line.price_subtotal})
+                     'open_qty': open_qty,
+                     'rate': currency_rate,
+                     'total': line.price_subtotal})
             data_list.append({'order': order, 'lines': report_data_list})
         return data_list
 
@@ -89,6 +91,7 @@ class SaleOrder(models.Model):
         worksheet.set_column('F:F', 12)
         worksheet.set_column('G:G', 12)
         worksheet.set_column('H:H', 12)
+        worksheet.set_column('I:I', 12)
         row = 0
         col = 0
 
@@ -124,6 +127,8 @@ class SaleOrder(models.Model):
                     worksheet.write(row, col + 6, lines.get('on_hand'),
                                     align_right)
                     worksheet.write(row, col + 7, lines.get('open_qty'),
+                                    align_right)
+                    worksheet.write(row, col + 8, lines.get('rate'),
                                     align_right)
 
             workbook.close()
