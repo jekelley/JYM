@@ -60,10 +60,10 @@
                                                 <span t-esc="line['open_qty']"/>
                                             </td>
                                             <td class="text-right">
-                                                <span t-esc="line['open_qty']"/> <!--rate-->
+                                                <span t-esc="line['rate']"/>
                                             </td>
                                             <td class="text-right">
-                                                <span t-esc="line['on_hand']"/> <!--total-->
+                                                <span t-esc="line['total']"/>
                                             </td>
                                         </tr>
                                     </t>
