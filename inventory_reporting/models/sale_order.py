@@ -95,6 +95,7 @@ class SaleOrder(models.Model):
         worksheet.set_column('G:G', 12)
         worksheet.set_column('H:H', 12)
         worksheet.set_column('I:I', 12)
+        worksheet.set_column('J:J', 12)
         row = 0
         col = 0
 
@@ -132,6 +133,8 @@ class SaleOrder(models.Model):
                     worksheet.write(row, col + 7, lines.get('open_qty'),
                                     align_right)
                     worksheet.write(row, col + 8, lines.get('rate'),
+                                    align_right)
+                    worksheet.write(row, col + 8, lines.get('total'),
                                     align_right)
 
             workbook.close()
