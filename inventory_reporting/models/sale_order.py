@@ -84,7 +84,7 @@ class SaleOrder(models.Model):
             title_format)
         header_str = [
             'Product', 'Description', 'Req. Date', 'UOM', 'Ordered Qty',
-            'Ship Qty', 'Onhand Qty', 'Open Qty']
+            'Ship Qty', 'Onhand Qty', 'Open Qty', 'Rate', 'Total']
 
         worksheet.set_column('A:A', 30)
         worksheet.set_column('B:B', 30)
@@ -134,7 +134,7 @@ class SaleOrder(models.Model):
                                     align_right)
                     worksheet.write(row, col + 8, lines.get('rate'),
                                     align_right)
-                    worksheet.write(row, col + 8, lines.get('total'),
+                    worksheet.write(row, col + 9, lines.get('total'),
                                     align_right)
 
             workbook.close()
