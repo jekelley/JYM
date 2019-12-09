@@ -28,9 +28,7 @@
                                         <th>Ordered Qty</th>
                                         <th>Ship Qty</th>
                                         <th>Onhand Qty</th>
-                                        <th>Open TEST Qty</th>
-                                        <th>Rate</th>
-                                        <th>Total</th>
+                                        <th>Open Qty</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -57,12 +55,6 @@
                                             </td>
                                             <td class="text-right">
                                                 <span t-esc="line['open_qty']"/>
-                                            </td>
-                                            <td class="text-right">
-                                                <span t-esc="line['rate']"/>
-                                            </td>
-                                            <td class="text-right">
-                                                <span t-esc="line['total']"/>
                                             </td>
                                         </tr>
                                     </t>

@@ -86,7 +86,7 @@ class SaleOrder(models.Model):
 
         worksheet.set_column('A:A', 30)
         worksheet.set_column('B:B', 30)
-        worksheet.set_column('C:C', 15)
+        worksheet.set_column('C:C', 30)
         worksheet.set_column('D:D', 12)
         worksheet.set_column('E:E', 12)
         worksheet.set_column('F:F', 12)
@@ -133,10 +133,6 @@ class SaleOrder(models.Model):
                     worksheet.write(row, col + 5, lines.get('on_hand'),
                                     align_right)
                     worksheet.write(row, col + 6, lines.get('open_qty'),
-                                    align_right)
-                    worksheet.write(row, col + 8, lines.get('rate'),
-                                    align_right)
-                    worksheet.write(row, col + 9, lines.get('total'),
                                     align_right)
 
             workbook.close()
@@ -204,6 +200,7 @@ class SaleOrder(models.Model):
         worksheet.set_column('D:D', 15)
         worksheet.set_column('G:G', 15)
         worksheet.set_column('I:I', 15)
+        worksheet.set_column('F:F', 15)
         row = 0
         col = 0
 
