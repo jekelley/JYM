@@ -105,7 +105,7 @@ class InvActivityReport(models.TransientModel):
                     if mrp_id.x_studio_stage_expected_date:
                         expected_date = datetime.strptime(
                             str(mrp_id.x_studio_stage_expected_date),
-                            '%Y-%m-%d').strftime('%d/%m/%Y')
+                            '%Y-%m-%d').strftime('%m/%d/%Y')
                     report_data_list.append(
                         {'mo_name': mrp_id.name, 'so_name': '', 'so_date': '',
                          'expected_date': expected_date,
@@ -124,11 +124,11 @@ class InvActivityReport(models.TransientModel):
                             if line.order_id.confirmation_date:
                                 confirmation_date = datetime.strptime(
                                     str(line.order_id.confirmation_date),
-                                    '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
+                                    '%Y-%m-%d %H:%M:%S').strftime('%m/%d/%Y')
                             if line.order_id.commitment_date:
                                 expected_date = datetime.strptime(
                                     str(line.order_id.commitment_date),
-                                    '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
+                                    '%Y-%m-%d %H:%M:%S').strftime('%m/%d/%Y')
                             report_data_list.append({
                                 'mo_name': '', 'so_name': line.order_id.name,
                                 'so_date': confirmation_date,
@@ -147,7 +147,7 @@ class InvActivityReport(models.TransientModel):
                     if mrp_id.x_studio_stage_expected_date:
                         expected_date = datetime.strptime(
                             str(mrp_id.x_studio_stage_expected_date),
-                            '%Y-%m-%d').strftime('%d/%m/%Y')
+                            '%Y-%m-%d').strftime('%m/%d/%Y')
                     report_data_list.append(
                         {'mo_name': mrp_id.name, 'po_name': '', 'po_date': '',
                          'expected_date': expected_date,
@@ -170,7 +170,7 @@ class InvActivityReport(models.TransientModel):
                             if line.order_id.x_studio_requested_ship_date:
                                 expected_date = datetime.strptime(str(
                                     line.order_id.x_studio_requested_ship_date
-                                ), '%Y-%m-%d').strftime('%d/%m/%Y')
+                                ), '%Y-%m-%d').strftime('%m/%d/%Y')
                             report_data_list.append({
                                 'mo_name': '', 'po_name': line.order_id.name,
                                 'po_date': date_order,
@@ -200,12 +200,21 @@ class InvActivityReport(models.TransientModel):
         red = workbook.add_format(
             {'font_color': 'red', 'align': 'right'})
 
+        date_start = datetime.strptime(str(self.date_start),
+            '%Y-%m-%d').strftime('%m/%d/%Y')
+        date_end = ''
+        if self.date_end:
+            date_end = datetime.strptime(str(self.date_end),
+                '%Y-%m-%d').strftime('%m/%d/%Y')
+
         report_context = self.env.context.get('report_context')
         if report_context == 'finish_goods':
             worksheet = workbook.add_worksheet('Inv - Activity FG')
             worksheet.merge_range(
                 0, 0, 0, 7, 'Inventory Activity Report - Finished Goods',
                 title_format)
+            worksheet.merge_range(
+                'A2:H2', date_start + ' - ' + date_end, title_format)
             header_str = [
                 'Manufacturing Order', 'Sales Order', 'Sales Order Date',
                 'Expected Date', 'Qty In', 'Qty Out', 'Available Inventory',
@@ -215,6 +224,8 @@ class InvActivityReport(models.TransientModel):
             worksheet.merge_range(
                 0, 0, 0, 7, 'Inventory Activity Report - Components',
                 title_format)
+            worksheet.merge_range(
+                'A2:H2', date_start + ' - ' + date_end, title_format)
             header_str = [
                 'Purchase Order', 'Manufacturing Order', 'PO Date',
                 'Expected Date', 'Qty In', 'Qty Out', 'Available Inventory',
@@ -226,7 +237,7 @@ class InvActivityReport(models.TransientModel):
         worksheet.set_column('D:D', 15)
         worksheet.set_column('G:G', 20)
         worksheet.set_column('H:H', 15)
-        row = 0
+        row = 1
         col = 0
 
         data_dict = {}

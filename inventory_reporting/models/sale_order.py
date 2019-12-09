@@ -24,16 +24,14 @@ class SaleOrder(models.Model):
                 if line.order_id.confirmation_date:
                     confirmation_date = datetime.strptime(
                         str(line.order_id.confirmation_date),
-                        '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
+                        '%Y-%m-%d %H:%M:%S').strftime('%m/%d/%Y')
                 if line.order_id.commitment_date:
                     expected_date = datetime.strptime(
                         str(line.order_id.commitment_date),
-                        '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
+                        '%Y-%m-%d %H:%M:%S').strftime('%m/%d/%Y')
                 report_data_list.append(
-                    {'order': line.order_id,
-                     'name': line.product_id.name,
-                     'description': line.name,
-                     'req_date': expected_date,
+                    {'order': line.order_id, 'name': line.product_id,
+                     'description': line.name, 'req_date': expected_date,
                      'order_date': confirmation_date,
                      'unit_price': line.price_unit,
                      'discount': line.discount,
@@ -83,8 +81,8 @@ class SaleOrder(models.Model):
             0, 0, 0, 7, 'Open Sale Order Report',
             title_format)
         header_str = [
-            'Product', 'Description', 'Req. Date', 'UOM', 'Ordered Qty',
-            'Ship Qty', 'Onhand Qty', 'Open Qty', 'Rate', 'Total']
+            'Product', 'Description', 'Req. Date', 'Ordered Qty',
+            'Ship Qty', 'Onhand Qty', 'Open Qty']
 
         worksheet.set_column('A:A', 30)
         worksheet.set_column('B:B', 30)
@@ -106,8 +104,13 @@ class SaleOrder(models.Model):
                 worksheet.set_row(row, 28)
                 worksheet.write(
                     row, col, 'Sale Order Number - ' + data['order'].name,
-                                header_format)
-                worksheet.write(row, col + 1,
+                    header_format)
+                po_number = ''
+                if data['order'].client_order_ref:
+                    po_number = data['order'].client_order_ref
+                worksheet.write(row, col + 1, 'PO Number - ' +
+                                po_number, header_format)
+                worksheet.write(row, col + 2,
                                 'Customer - ' + data['order'].partner_id.name,
                                 header_format)
                 row += 1
@@ -117,20 +120,19 @@ class SaleOrder(models.Model):
                 for lines in data['lines']:
                     row += 1
                     worksheet.set_row(row, 35)
-                    worksheet.write(row, col, lines.get('name'), row_format)
+                    worksheet.write(row, col, lines.get('name').default_code,
+                                    row_format)
                     worksheet.write(row, col + 1, lines.get('description'),
                                     row_format)
                     worksheet.write(row, col + 2, lines.get('req_date'),
                                     align_right)
-                    worksheet.write(row, col + 3, lines.get('product_uom'),
-                                    row_format)
-                    worksheet.write(row, col + 4, lines.get('order_qty'),
+                    worksheet.write(row, col + 3, lines.get('order_qty'),
                                     align_right)
-                    worksheet.write(row, col + 5, lines.get('ship_qty'),
+                    worksheet.write(row, col + 4, lines.get('ship_qty'),
                                     align_right)
-                    worksheet.write(row, col + 6, lines.get('on_hand'),
+                    worksheet.write(row, col + 5, lines.get('on_hand'),
                                     align_right)
-                    worksheet.write(row, col + 7, lines.get('open_qty'),
+                    worksheet.write(row, col + 6, lines.get('open_qty'),
                                     align_right)
                     worksheet.write(row, col + 8, lines.get('rate'),
                                     align_right)
@@ -219,7 +221,7 @@ class SaleOrder(models.Model):
                                     lines.get('order').partner_id.name)
                     worksheet.write(row, col + 2, lines.get('order_date'),
                                     align_right)
-                    worksheet.write(row, col + 3, lines.get('name'),
+                    worksheet.write(row, col + 3, lines.get('name').name,
                                     row_format)
                     worksheet.write(row, col + 4, lines.get('product_uom'))
                     worksheet.write(row, col + 5, lines.get('order_qty'),

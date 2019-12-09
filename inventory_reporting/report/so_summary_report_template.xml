@@ -7,12 +7,25 @@
                     <t class="page">
                         <div class="text-center">
                             <h2>Sale Order Summary Report</h2>
+                            <h4>
+                                <span t-esc="datetime.datetime.strptime(
+                            str(o.date_start),
+                            '%Y-%m-%d').strftime('%m/%d/%Y')"/>
+                                -
+                                <t t-if="o.date_end">
+                                    <span t-esc="datetime.datetime.strptime(
+                            str(o.date_end),
+                            '%Y-%m-%d').strftime('%m/%d/%Y')"/>
+                                </t>
+                            </h4>
                         </div>
+                        <br/>
                         <table class="table table-condensed">
                             <thead>
                                 <tr>
                                     <th>SO Number</th>
                                     <th>Partner</th>
+                                    <th>PO Number</th>
                                     <th>Order Date</th>
                                     <th>Req. Date</th>
                                     <th>Completed Date</th>
@@ -28,6 +41,9 @@
                                             </td>
                                             <td>
                                                 <span t-esc="data['partner']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="data['po_number']"/>
                                             </td>
                                             <td class="text-right">
                                                 <span t-esc="data['so_date']"/>

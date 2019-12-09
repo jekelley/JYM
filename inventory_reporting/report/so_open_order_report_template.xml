@@ -13,6 +13,9 @@
                             <b>Sale Order Number - </b>
                                 <t t-esc="so_info['order'].name"/>
                             &#160;
+                            <b>PO Number - </b>
+                                <t t-esc="so_info['order'].client_order_ref"/>
+                            &#160;
                             <b>Customer - </b>
                                 <t t-esc="so_info['order'].partner_id.name"/>
 
@@ -22,7 +25,6 @@
                                         <th>Product</th>
                                         <th>Description</th>
                                         <th>Req. Date</th>
-                                        <th>UOM</th>
                                         <th>Ordered Qty</th>
                                         <th>Ship Qty</th>
                                         <th>Onhand Qty</th>
@@ -36,16 +38,13 @@
                                        t-as="line">
                                         <tr>
                                             <td>
-                                                <span t-esc="line['name']"/>
+                                                <span t-esc="line['name'].default_code"/>
                                             </td>
                                             <td>
                                                 <span t-esc="line['description']"/>
                                             </td>
                                             <td class="text-right">
                                                 <span t-esc="line['req_date']"/>
-                                            </td>
-                                            <td>
-                                                <span t-esc="line['product_uom']"/>
                                             </td>
                                             <td class="text-right">
                                                 <span t-esc="line['order_qty']"/>
