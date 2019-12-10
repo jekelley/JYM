@@ -43,5 +43,13 @@
             file="inventory_reporting.report_so_summary"
             name="inventory_reporting.report_so_summary"
         />
+        <report
+            id="action_report_so_history"
+            string="SO History"
+            model="wizard.so.history"
+            report_type="qweb-pdf"
+            file="inventory_reporting.report_so_history"
+            name="inventory_reporting.report_so_history"
+        />
     </data>
 </odoo>
