@@ -11,6 +11,19 @@ from odoo.exceptions import UserError
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    def _format_amount(self, amount, currency):
+        fmt = "%.{0}f".format(currency.decimal_places)
+        lang = self.env['res.lang']._lang_get(self.env.context.get('lang') or 'en_US')
+        res =  lang.format(fmt, currency.round(amount), grouping=True, monetary=True)\
+            .replace(r' ', u'\N{NO-BREAK SPACE}').replace(r'-', u'-\N{ZERO WIDTH NO-BREAK SPACE}')
+
+        if currency and currency.symbol:
+            if currency.position == 'after':
+                res = '%s %s' % (res, currency.symbol)
+            elif currency and currency.position == 'before':
+                res = '%s %s' % (currency.symbol, res)
+        return res
+
     def get_open_order(self):
         # Returns dictionary of sale order data
         data_list = []
@@ -33,7 +46,9 @@ class SaleOrder(models.Model):
                     {'order': line.order_id, 'name': line.product_id,
                      'description': line.name, 'req_date': expected_date,
                      'order_date': confirmation_date,
-                     'unit_price': line.price_unit,
+                     'unit_price': self._format_amount(
+                         line.price_unit,
+                         line.order_id.company_id.currency_id),
                      'discount': line.discount,
                      'product_uom': line.product_uom.name,
                      'order_qty': line.product_uom_qty,
@@ -41,7 +56,9 @@ class SaleOrder(models.Model):
                      'on_hand': line.product_id.qty_available,
                      'open_qty': open_qty,
                      'rate': line.order_id.currency_rate,
-                     'total': line.price_subtotal})
+                     'total': self._format_amount(
+                         line.price_subtotal,
+                         line.order_id.company_id.currency_id)})
             data_list.append({'order': order, 'lines': report_data_list})
         return data_list
 
@@ -82,7 +99,7 @@ class SaleOrder(models.Model):
             title_format)
         header_str = [
             'Product', 'Description', 'Req. Date', 'Ordered Qty',
-            'Ship Qty', 'Onhand Qty', 'Open Qty']
+            'Ship Qty', 'Onhand Qty', 'Open Qty', 'Rate', 'Total']
 
         worksheet.set_column('A:A', 30)
         worksheet.set_column('B:B', 30)
@@ -133,6 +150,10 @@ class SaleOrder(models.Model):
                     worksheet.write(row, col + 5, lines.get('on_hand'),
                                     align_right)
                     worksheet.write(row, col + 6, lines.get('open_qty'),
+                                    align_right)
+                    worksheet.write(row, col + 7, lines.get('rate'),
+                                    align_right)
+                    worksheet.write(row, col + 8, lines.get('total'),
                                     align_right)
 
             workbook.close()

@@ -19,7 +19,7 @@
                             <b>Customer - </b>
                                 <t t-esc="so_info['order'].partner_id.name"/>
 
-                            <table class="table table-condensed">
+                            <table class="table table-condensed" width="100%">
                                 <thead>
                                     <tr>
                                         <th>Product</th>
@@ -29,6 +29,8 @@
                                         <th>Ship Qty</th>
                                         <th>Onhand Qty</th>
                                         <th>Open Qty</th>
+                                        <th>Rate</th>
+                                        <th>Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -55,6 +57,12 @@
                                             </td>
                                             <td class="text-right">
                                                 <span t-esc="line['open_qty']"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="line['rate']"/>
+                                            </td>
+                                            <td class="text-right" width="15%">
+                                                <span t-esc="line['total']"/>
                                             </td>
                                         </tr>
                                     </t>
