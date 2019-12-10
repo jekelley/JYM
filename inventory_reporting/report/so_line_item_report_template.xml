@@ -45,13 +45,13 @@
                                             <td class="text-right">
                                                 <span t-esc="line['order_qty']"/>
                                             </td>
-                                            <td class="text-right">
+                                            <td class="text-right" width="15%">
                                                 <span t-esc="line['unit_price']"/>
                                             </td>
                                             <td class="text-right">
                                                 <span t-esc="line['discount']"/>
                                             </td>
-                                            <td class="text-right">
+                                            <td class="text-right" width="15%">
                                                 <span t-esc="line['total']"/>
                                             </td>
                                         </tr>

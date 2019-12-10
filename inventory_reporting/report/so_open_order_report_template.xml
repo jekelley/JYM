@@ -19,7 +19,7 @@
                             <b>Customer - </b>
                                 <t t-esc="so_info['order'].partner_id.name"/>
 
-                            <table class="table table-condensed" width="100%">
+                            <table class="table table-condensed">
                                 <thead>
                                     <tr>
                                         <th>Product</th>
