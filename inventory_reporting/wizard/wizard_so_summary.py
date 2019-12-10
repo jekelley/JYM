@@ -6,7 +6,6 @@ from io import BytesIO
 import xlsxwriter
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from decimal import Decimal
 
 
 class SOSummary(models.TransientModel):
@@ -50,18 +49,20 @@ class SOSummary(models.TransientModel):
                     str(sale.x_studio_completed_date),
                     '%Y-%m-%d').strftime('%m/%d/%Y')
             total += sale.amount_total
+
             report_data_list.append(
                 {'so_name': sale.name, 'partner': sale.partner_id.name,
                  'po_number': sale.client_order_ref,
                  'so_date': confirmation_date,
                  'expected_date': expected_date,
                  'completed_date': completed_date,
-                 'amt': sale.company_id.currency_id.symbol + ' {:,.2f}'.format(
-                     sale.amount_total)})
+                 'amt': self.env['sale.order']._format_amount(
+                     sale.amount_total, sale.company_id.currency_id)})
         if report_data_list:
             data_list.append({
-                'total': sale.company_id.currency_id.symbol + ' {:,.2f}'.format(
-                    total), 'data': report_data_list})
+                'total': self.env['sale.order']._format_amount(
+                    total, sale.company_id.currency_id),
+                'data': report_data_list})
         return data_list
 
     @api.multi
