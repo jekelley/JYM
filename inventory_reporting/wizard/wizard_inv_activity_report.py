@@ -145,8 +145,8 @@ class InvActivityReport(models.TransientModel):
                     else:
                         total -= mrp_id.product_qty
                     if mrp_id.date_planned_start:
-                        expected_date = datetime.date().strptime(
-                            str(mrp_id.date_planned_start),
+                        expected_date = datetime.strptime(
+                            str(mrp_id.date_planned_start.date()),
                             '%Y-%m-%d').strftime('%m/%d/%Y')
                     report_data_list.append(
                         {'mo_name': mrp_id.name, 'po_name': '', 'po_date': '',
