@@ -48,10 +48,10 @@ class InvActivityReport(models.TransientModel):
                 domain).mapped('order_id').ids
         domain = [('product_id', '=', product_id.id),
                   ('state', '!=', 'cancel'),
-                  ('x_studio_stage_expected_date', '>=', date_start)]
+                  ('date_planned_start', '>=', date_start)]
         if date_end:
             domain.append(
-                ('x_studio_stage_expected_date', '<=', date_end))
+                ('date_planned_start', '<=', date_end))
         mrp_ids = self.env['mrp.production'].search(domain).ids
         if not order_ids:
             order_ids = [0]
@@ -61,7 +61,7 @@ class InvActivityReport(models.TransientModel):
         if report_context == 'finish_goods':
             sql_query = """
                         SELECT mrp.id, mrp.name as name, 
-                        mrp.x_studio_stage_expected_date as expected_date 
+                        mrp.date_planned_start as expected_date 
                         from mrp_production as mrp 
                         where id in %s
                         UNION
@@ -73,7 +73,7 @@ class InvActivityReport(models.TransientModel):
         else:
             sql_query = """
                         SELECT mrp.id, mrp.name as name, 
-                        mrp.x_studio_stage_expected_date as expected_date 
+                        mrp.date_planned_start as expected_date 
                         from mrp_production as mrp 
                         where id in %s
                         UNION
@@ -102,9 +102,9 @@ class InvActivityReport(models.TransientModel):
                         total = product_id.qty_available + mrp_id.product_qty
                     else:
                         total += mrp_id.product_qty
-                    if mrp_id.x_studio_stage_expected_date:
+                    if mrp_id.date_planned_start:
                         expected_date = datetime.strptime(
-                            str(mrp_id.x_studio_stage_expected_date),
+                            str(mrp_id.date_planned_start.date()),
                             '%Y-%m-%d').strftime('%m/%d/%Y')
                     report_data_list.append(
                         {'mo_name': mrp_id.name, 'so_name': '', 'so_date': '',
@@ -144,9 +144,9 @@ class InvActivityReport(models.TransientModel):
                         total = product_id.qty_available - mrp_id.product_qty
                     else:
                         total -= mrp_id.product_qty
-                    if mrp_id.x_studio_stage_expected_date:
+                    if mrp_id.date_planned_start:
                         expected_date = datetime.strptime(
-                            str(mrp_id.x_studio_stage_expected_date),
+                            str(mrp_id.date_planned_start.date()),
                             '%Y-%m-%d').strftime('%m/%d/%Y')
                     report_data_list.append(
                         {'mo_name': mrp_id.name, 'po_name': '', 'po_date': '',
