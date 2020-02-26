@@ -34,7 +34,7 @@ class SOHistory(models.TransientModel):
             self.state_sale = True
             self.state_done = True
             self.state_cancel = True
-        if not  self.state_all:
+        if not self.state_all:
             self.state_draft = False
             self.state_sent = False
             self.state_sale = False
@@ -84,10 +84,11 @@ class SOHistory(models.TransientModel):
                 report_data_list.append(
                     {'order': line.order_id, 'name': line.product_id,
                      'description': line.name, 'req_date': expected_date,
-                     'order_qty': line.product_uom_qty,
-                     'ship_qty': line.qty_delivered,
-                     'on_hand': line.product_id.qty_available,
-                     'open_qty': open_qty,
+                     'order_qty': '{0:,.2f}'.format(line.product_uom_qty),
+                     'ship_qty': '{0:,.2f}'.format(line.qty_delivered),
+                     'on_hand': '{0:,.2f}'.format(
+                         line.product_id.qty_available),
+                     'open_qty': '{0:,.2f}'.format(open_qty),
                      'rate': line.order_id.currency_rate,
                      'total': self.env['sale.order']._format_amount(
                          line.price_subtotal,

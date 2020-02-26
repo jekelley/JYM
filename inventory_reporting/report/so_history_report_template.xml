@@ -3,11 +3,11 @@
     <template id="report_so_history">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-call="web.external_layout">
+                <t t-call="inventory_reporting.activity_layout">
                     <t class="page">
                         <div class="text-center">
-                            <h2>Sale Order History Report</h2>
-                            <h4>
+                            <h4>Sale Order History Report</h4>
+                            <h6>
                                 <span t-esc="datetime.datetime.strptime(
                             str(o.date_start),
                             '%Y-%m-%d').strftime('%m/%d/%Y')"/>
@@ -17,7 +17,7 @@
                             str(o.date_end),
                             '%Y-%m-%d').strftime('%m/%d/%Y')"/>
                                 </t>
-                            </h4>
+                            </h6>
                         </div>
                         <br/>
                         <t t-foreach="o.get_data()" t-as="so_info">
@@ -31,7 +31,7 @@
                             <b>Customer - </b>
                                 <t t-esc="so_info['order'].partner_id.name"/>
 
-                            <table class="table table-condensed">
+                            <table class="table table-condensed report_style">
                                 <thead>
                                     <tr>
                                         <th>Product</th>
@@ -52,7 +52,7 @@
                                             <td>
                                                 <span t-esc="line['name'].default_code"/>
                                             </td>
-                                            <td>
+                                            <td width="20%">
                                                 <span t-esc="line['description']"/>
                                             </td>
                                             <td class="text-right">
@@ -73,7 +73,7 @@
                                             <td class="text-right">
                                                 <span t-esc="line['rate']"/>
                                             </td>
-                                            <td class="text-right" width="15%">
+                                            <td class="text-right">
                                                 <span t-esc="line['total']"/>
                                             </td>
                                         </tr>

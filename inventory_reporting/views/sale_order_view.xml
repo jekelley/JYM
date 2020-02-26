@@ -41,17 +41,20 @@
         </field>
     </record>
 
+<!--    <menuitem id="menu_so_report" name="Sale Order Reporting"-->
+<!--              parent="sale.menu_sale_report"/>-->
+
     <!--Menu to Print Sale Order - Open Order Report-->
     <menuitem id="menu_sale_report" name="SO Open Order Report"
-              parent="menu_inv_report" sequence="3" action="action_sale_report"/>
+              parent="sale.menu_sale_report" sequence="2" action="action_sale_report"/>
 
     <menuitem id="menu_sale_report_excel" name="SO Open Order Excel Report"
-              parent="menu_inv_report" sequence="4" action="action_sale_report_excel"/>
+              parent="sale.menu_sale_report" sequence="3" action="action_sale_report_excel"/>
 
     <!--Menu to Print Sale Line Item Report-->
     <menuitem id="menu_sale_line_item_report" name="SO Line Item Report"
-              parent="menu_inv_report" sequence="5" action="action_sale_line_item_report"/>
+              parent="sale.menu_sale_report" sequence="4" action="action_sale_line_item_report"/>
 
     <menuitem id="menu_sale_line_item_report_excel" name="SO Line Item Excel Report"
-              parent="menu_inv_report" sequence="6" action="action_sale_line_item_report_excel"/>
+              parent="sale.menu_sale_report" sequence="5" action="action_sale_line_item_report_excel"/>
 </odoo>

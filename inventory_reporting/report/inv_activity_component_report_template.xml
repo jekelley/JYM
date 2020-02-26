@@ -5,8 +5,8 @@
             <t t-call="web.external_layout">
                 <div class="page">
                     <div class="text-center">
-                        <h2>Inventory Activity Report - Components</h2>
-                        <h4>
+                        <h4>Inventory Activity Report - Components</h4>
+                        <h6>
                             <span t-esc="datetime.datetime.strptime(
                             str(data['form']['date_start']),
                             '%Y-%m-%d').strftime('%m/%d/%Y')"/>
@@ -16,7 +16,7 @@
                             str(data['form']['date_end']),
                             '%Y-%m-%d').strftime('%m/%d/%Y')"/>
                             </t>
-                        </h4>
+                        </h6>
                     </div>
                     <t t-foreach="data['inv_data']" t-as="inv">
                         <br/>
@@ -24,7 +24,7 @@
                             <span t-esc="inv.default_code"/>
                         </b>
 
-                        <table class="table table-condensed">
+                        <table class="table table-condensed report_style">
                             <thead>
                                 <tr>
                                     <th>Purchase Order</th>
@@ -48,21 +48,19 @@
                                     <t t-if="inv.qty_available &lt; 0">
                                         <td class="text-right"
                                             style="color:red;">(
-                                            <span
-                                                    t-esc="abs(inv.qty_available)"/>
-                                            )
+                                            <span t-esc="'{0:,.2f}'.format(abs(inv.qty_available))"/>)
                                         </td>
                                     </t>
                                     <t t-if="inv.qty_available &gt; 0 or inv.qty_available == 0.0">
                                         <td class="text-right">
-                                            <span t-esc="inv.qty_available"/>
+                                            <span t-esc="'{0:,.2f}'.format(abs(inv.qty_available))"/>
                                         </td>
                                     </t>
                                     <td></td>
                                 </tr>
                                 <t t-foreach="data['inv_data'][inv]"
                                    t-as="rec">
-                                    <tr>
+                                    <tr width="100%">
                                         <td>
                                             <span t-esc="rec['po_name']"/>
                                         </td>
@@ -84,17 +82,15 @@
                                         <t t-if="rec['avail_inv'] &lt; 0">
                                             <td class="text-right"
                                                 style="color:red;">(
-                                                <span
-                                                        t-esc="abs(rec['avail_inv'])"/>
-                                                )
+                                                <span t-esc="rec['avail_inv_str']"/>)
                                             </td>
                                         </t>
                                         <t t-if="rec['avail_inv'] &gt; 0 or rec['avail_inv'] == 0.0">
                                             <td class="text-right">
-                                                <span t-esc="rec['avail_inv']"/>
+                                                <span t-esc="rec['avail_inv_str']"/>
                                             </td>
                                         </t>
-                                        <td>
+                                        <td width="25%">
                                             <span t-esc="rec['partner_name']"/>
                                         </td>
                                     </tr>

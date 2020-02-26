@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- PDF Report Wizard Form -->
-    <record id="view_wizard_inv_activity_fg_pdf_report_form" model="ir.ui.view">
-        <field name="name">wizard.activity.finish.goods.pdf.form</field>
-        <field name="model">wizard.activity.finish.goods</field>
+    <record id="view_wizard_inv_stock_by_lot_pdf_report_form" model="ir.ui.view">
+        <field name="name">wizard.stock.by.lot.pdf.form</field>
+        <field name="model">wizard.stock.by.lot</field>
         <field name="type">form</field>
         <field name="priority" eval="8"/>
         <field name="arch" type="xml">
-            <form string="INV FG PDF Report">
+            <form string="INV Stock By Lot PDF Report">
                 <group>
                     <group>
                         <field name="date_start" required="1"/>
@@ -22,7 +22,7 @@
                 </group>
 
                 <footer>
-                    <button string='Print PDF' name="print_inv_pdf_report"
+                    <button string='Print PDF' name="print_by_lot_pdf_report"
                             type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary"
                             special="cancel"/>
@@ -33,25 +33,25 @@
 
     <!-- PDF Report Wizard Action -->
     <record model="ir.actions.act_window"
-            id="action_wizard_inv_finish_goods_pdf_view">
-        <field name="name">Activity FG PDF Report</field>
+            id="action_wizard_stock_by_lot_pdf_view">
+        <field name="name">Stock By Lot PDF Report</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">wizard.activity.finish.goods</field>
+        <field name="res_model">wizard.stock.by.lot</field>
         <field name="view_type">form</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="view_wizard_inv_activity_fg_pdf_report_form"/>
-        <field name="context">{'report_context': 'finish_goods'}</field>
+        <field name="view_id" ref="view_wizard_inv_stock_by_lot_pdf_report_form"/>
+        <field name="context">{'report_context': 'by_lot'}</field>
         <field name="target">new</field>
     </record>
 
-    <!-- Excel Report Wizard Form -->
-    <record id="view_wizard_inv_activity_fg_excel_report_form" model="ir.ui.view">
-        <field name="name">wizard.activity.finish.goods.excel.form</field>
-        <field name="model">wizard.activity.finish.goods</field>
+    <!-- &lt;!&ndash; Excel Report Wizard Form &ndash;&gt; -->
+    <record id="view_wizard_inv_stock_by_lot_excel_report_form" model="ir.ui.view">
+        <field name="name">wizard.stock.by.lot.excel.form</field>
+        <field name="model">wizard.stock.by.lot</field>
         <field name="type">form</field>
         <field name="priority" eval="8"/>
         <field name="arch" type="xml">
-            <form string="INV FG Excel Report">
+            <form string="NV Stock By Lot Excel Report">
                 <group>
                     <group>
                         <field name="date_start" required="1"/>
@@ -66,7 +66,7 @@
                 </group>
 
                 <footer>
-                    <button string='Export to Excel' name="print_excel_report"
+                    <button string='Export to Excel' name="print_excel_by_lot_excel_report"
                             type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary"
                             special="cancel"/>
@@ -75,30 +75,26 @@
         </field>
     </record>
 
-    <!-- Excel Report Wizard Action -->
+   <!--  &lt;!&ndash; Excel Report Wizard Action &ndash;&gt; -->
     <record model="ir.actions.act_window"
-            id="action_wizard_inv_finish_goods_excel_view">
-        <field name="name">Activity FG Excel Report</field>
+            id="action_wizard_stock_by_lot_excel_view">
+        <field name="name">Stock By Lot Excel Report</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">wizard.activity.finish.goods</field>
+        <field name="res_model">wizard.stock.by.lot</field>
         <field name="view_type">form</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="view_wizard_inv_activity_fg_excel_report_form"/>
-        <field name="context">{'report_context': 'finish_goods'}</field>
+        <field name="view_id" ref="view_wizard_inv_stock_by_lot_excel_report_form"/>
+        <field name="context">{'report_context': 'by_lot'}</field>
         <field name="target">new</field>
     </record>
 
-    <menuitem id="menu_inv_report" name="Inventory Reporting"
-              parent="stock.menu_warehouse_report"
-              sequence="5"/>
+    <menuitem id="menu_inv_by_lot_pdf_report"
+              name="Inv Stock By Lot PDF Report"
+              action="action_wizard_stock_by_lot_pdf_view"
+              parent="menu_inv_report" sequence="5"/>
 
-    <menuitem id="menu_inv_finish_good_pdf_report"
-              name="Inv Finish Good PDF Report"
-              action="action_wizard_inv_finish_goods_pdf_view"
-              parent="menu_inv_report" sequence="1"/>
-
-    <menuitem id="menu_inv_finish_good_excel_report"
-              name="Inv Finish Good Excel Report"
-              action="action_wizard_inv_finish_goods_excel_view"
-              parent="menu_inv_report" sequence="2"/>
+    <menuitem id="menu_inv_by_lot_excel_report"
+            name="Inv Stock By Lot Excel Report"
+            action="action_wizard_stock_by_lot_excel_view"
+            parent="menu_inv_report" sequence="6"/>
 </odoo>

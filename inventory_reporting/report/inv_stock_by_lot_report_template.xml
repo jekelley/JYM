@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_inv_stock_by_lot_reports">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <div class="text-center">
+                        <h4>Inventory Stock By Lot</h4>
+                        <h6>
+                            <span t-esc="datetime.datetime.strptime(
+                            str(data['form']['date_start']),
+                            '%Y-%m-%d').strftime('%m/%d/%Y')"/>
+                            -
+                            <t t-if="data['form']['date_end']">
+                                <span t-esc="datetime.datetime.strptime(
+                            str(data['form']['date_end']),
+                            '%Y-%m-%d').strftime('%m/%d/%Y')"/>
+                            </t>
+                        </h6>
+                    </div>
+                    <t t-foreach="data['product_data']" t-as="product">
+                        <br/>
+                        <b><span t-esc="product.name"/> - <span t-esc="product.default_code"/>
+                        </b>
+
+                        <table class="table table-condensed report_style">
+                            <thead>
+                                <tr>
+                                    <th>Lot</th>
+                                    <th>Quantity</th>
+                                    <th>Manufactured</th>
+                                    <th>Expires</th>
+                                    <th>Months Remaining</th>
+                                    <th>Shelf Life</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody class="lot_tbody">
+                                <t t-foreach="data['product_data'][product]"
+                                   t-as="rec">
+                                    <tr width="100%">
+                                        <td>
+                                            <span t-esc="rec['lot_name']"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="rec['lot_qty']"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="rec['manufacturing_date']"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="rec['expire_date']"/>
+                                        </td>
+                                        <t t-if="rec['month_rem'] &lt; 0">
+                                            <td class="text-right"
+                                                style="color:red;">(<span
+                                                    t-esc="rec['month_rem_str']"/>)
+                                            </td>
+                                        </t>
+                                        <t t-if="rec['month_rem'] &gt; 0 or rec['month_rem'] == 0.0">
+                                            <td class="text-right">
+                                                <span t-esc="rec['month_rem_str']"/>
+                                            </td>
+                                        </t>
+                                        <t t-if="rec['shelf_life'] &lt; 0">
+                                            <td class="text-right"
+                                                style="color:red;">(<span
+                                                    t-esc="rec['shelf_life_str']"/>)
+                                            </td>
+                                        </t>
+                                        <t t-if="rec['shelf_life'] &gt; 0 or rec['shelf_life'] == 0.0">
+                                            <td class="text-right">
+                                                <span t-esc="rec['shelf_life_str']"/>
+                                            </td>
+                                        </t>
+                                        <td class="text-right">
+                                            <span t-esc="rec['value']" />
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

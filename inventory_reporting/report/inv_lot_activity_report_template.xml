@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_inv_lot_activity_reports">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <div class="text-center">
+                        <h4>Inventory Lot Activity</h4>
+                        <h6>
+                            <span t-esc="datetime.datetime.strptime(
+                            str(data['form']['date_start']),
+                            '%Y-%m-%d').strftime('%m/%d/%Y')"/>
+                            -
+                            <t t-if="data['form']['date_end']">
+                                <span t-esc="datetime.datetime.strptime(
+                            str(data['form']['date_end']),
+                            '%Y-%m-%d').strftime('%m/%d/%Y')"/>
+                            </t>
+                        </h6>
+                    </div>
+                    <t t-foreach="data['lot_data']" t-as="lot">
+                        <br/>
+                        <b>Lot Number - <span t-esc="lot.name"/>
+                        </b>
+
+                        <table class="table table-condensed report_style">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>SKU</th>
+                                    <th>Date</th>
+                                    <th>Partner</th>
+                                    <th>Num</th>
+                                    <th>Quantity</th>
+                                    <th>Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody class="lot_tbody">
+                                <t t-foreach="data['lot_data'][lot]"
+                                   t-as="rec">
+                                    <tr width="100%">
+                                        <td>
+                                            <span t-esc="rec['type']"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="rec['sku']"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="rec['date']"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="rec['partner']"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="rec['num']"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="rec['qty']"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="rec['balance']"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

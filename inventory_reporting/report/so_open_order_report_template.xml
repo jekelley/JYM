@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <template id="activity_layout">
+        <t t-if="not o" t-set="o" t-value="doc"/>
+
+        <t t-if="not company">
+            <!-- Multicompany -->
+            <t t-if="company_id">
+                <t t-set="company" t-value="company_id"/>
+            </t>
+            <t t-elif="o and 'company_id' in o">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-else="else">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+        </t>
+        <div class="header">
+        </div>
+
+        <div class="article o_report_layout_boxed"
+             t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+             t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <t t-call="web.address_layout"/>
+            <t t-raw="0"/>
+        </div>
+        <div class="footer o_boxed_footer">
+        </div>
+    </template>
+
     <template id="report_so_open_order">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-call="web.external_layout">
+                <t t-call="inventory_reporting.activity_layout">
                     <t class="page">
                         <div class="text-center">
-                            <h2>Open Sale Order Report</h2>
+                            <h4>Open Sale Order Report</h4>
                         </div>
                         <t t-foreach="o.get_open_order()" t-as="so_info">
                             <br/>
@@ -19,7 +47,7 @@
                             <b>Customer - </b>
                                 <t t-esc="so_info['order'].partner_id.name"/>
 
-                            <table class="table table-condensed">
+                            <table class="table table-condensed report_style">
                                 <thead>
                                     <tr>
                                         <th>Product</th>
@@ -40,7 +68,7 @@
                                             <td>
                                                 <span t-esc="line['name'].default_code"/>
                                             </td>
-                                            <td>
+                                            <td width="25%">
                                                 <span t-esc="line['description']"/>
                                             </td>
                                             <td class="text-right">
@@ -61,7 +89,7 @@
                                             <td class="text-right">
                                                 <span t-esc="line['rate']"/>
                                             </td>
-                                            <td class="text-right" width="15%">
+                                            <td class="text-right">
                                                 <span t-esc="line['total']"/>
                                             </td>
                                         </tr>

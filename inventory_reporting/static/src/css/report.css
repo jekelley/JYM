@@ -1,0 +1,6 @@
+.report_style td, .report_style th{
+    padding: 0.2rem !important;
+}
+.report_style{
+    line-height: 15px !important;
+}

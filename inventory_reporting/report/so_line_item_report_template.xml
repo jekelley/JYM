@@ -3,13 +3,13 @@
     <template id="report_so_line_item">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-call="web.external_layout">
+                <t t-call="inventory_reporting.activity_layout">
                     <t class="page">
                         <div class="text-center">
-                            <h2>Open Sale Order Line Item Report</h2>
+                            <h4>Open Sale Order Line Item Report</h4>
                         </div>
                         <t t-foreach="o.get_open_order()" t-as="so_info">
-                            <table class="table table-condensed">
+                            <table class="table table-condensed report_style">
                                 <thead>
                                     <tr>
                                         <th>SO Number</th>
@@ -30,7 +30,7 @@
                                             <td>
                                                 <span t-esc="line['order'].name"/>
                                             </td>
-                                            <td>
+                                            <td width="15%">
                                                 <span t-esc="line['order'].partner_id.name"/>
                                             </td>
                                             <td class="text-right">
@@ -45,13 +45,13 @@
                                             <td class="text-right">
                                                 <span t-esc="line['order_qty']"/>
                                             </td>
-                                            <td class="text-right" width="15%">
+                                            <td class="text-right">
                                                 <span t-esc="line['unit_price']"/>
                                             </td>
                                             <td class="text-right">
                                                 <span t-esc="line['discount']"/>
                                             </td>
-                                            <td class="text-right" width="15%">
+                                            <td class="text-right">
                                                 <span t-esc="line['total']"/>
                                             </td>
                                         </tr>

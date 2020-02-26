@@ -13,9 +13,12 @@ class SaleOrder(models.Model):
 
     def _format_amount(self, amount, currency):
         fmt = "%.{0}f".format(currency.decimal_places)
-        lang = self.env['res.lang']._lang_get(self.env.context.get('lang') or 'en_US')
-        res =  lang.format(fmt, currency.round(amount), grouping=True, monetary=True)\
-            .replace(r' ', u'\N{NO-BREAK SPACE}').replace(r'-', u'-\N{ZERO WIDTH NO-BREAK SPACE}')
+        lang = self.env['res.lang']._lang_get(
+            self.env.context.get('lang') or 'en_US')
+        res = lang.format(
+            fmt, currency.round(amount), grouping=True, monetary=True
+        ).replace(r' ', u'\N{NO-BREAK SPACE}').replace(
+            r'-', u'-\N{ZERO WIDTH NO-BREAK SPACE}')
 
         if currency and currency.symbol:
             if currency.position == 'after':
@@ -49,13 +52,15 @@ class SaleOrder(models.Model):
                      'unit_price': self._format_amount(
                          line.price_unit,
                          line.order_id.company_id.currency_id),
-                     'discount': line.discount,
+                     'discount': '{0:,.2f}'.format(int(line.discount)),
                      'product_uom': line.product_uom.name,
-                     'order_qty': line.product_uom_qty,
-                     'ship_qty': line.qty_delivered,
-                     'on_hand': line.product_id.qty_available,
-                     'open_qty': open_qty,
-                     'rate': line.order_id.currency_rate,
+                     'order_qty': '{0:,.2f}'.format(int(line.product_uom_qty)),
+                     'ship_qty': '{0:,.2f}'.format(int(line.qty_delivered)),
+                     'on_hand': '{0:,.2f}'.format(
+                         int(line.product_id.qty_available)),
+                     'open_qty': '{0:,.2f}'.format(int(open_qty)),
+                     'rate': '{0:,.2f}'.format(
+                         int(line.order_id.currency_rate)),
                      'total': self._format_amount(
                          line.price_subtotal,
                          line.order_id.company_id.currency_id)})

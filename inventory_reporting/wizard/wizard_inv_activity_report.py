@@ -109,8 +109,9 @@ class InvActivityReport(models.TransientModel):
                     report_data_list.append(
                         {'mo_name': mrp_id.name, 'so_name': '', 'so_date': '',
                          'expected_date': expected_date,
-                         'qty_in': mrp_id.product_qty,
+                         'qty_in': '{0:,.2f}'.format(int(mrp_id.product_qty)),
                          'qty_out': '', 'avail_inv': total,
+                         'avail_inv_str': '{0:,.2f}'.format(abs(int(total))),
                          'partner_name': ''})
                 else:
                     for line in sale_id.order_line:
@@ -133,8 +134,11 @@ class InvActivityReport(models.TransientModel):
                                 'mo_name': '', 'so_name': line.order_id.name,
                                 'so_date': confirmation_date,
                                 'expected_date': expected_date,
-                                'qty_in': '', 'qty_out': line.product_uom_qty,
+                                'qty_in': '', 'qty_out': '{0:,.2f}'.format(
+                                    int(line.product_uom_qty)),
                                 'avail_inv': total,
+                                'avail_inv_str': '{0:,.2f}'.format(
+                                    abs(int(total))),
                                 'partner_name': line.order_id.partner_id.name})
             else:
                 purchase_id = self.env['purchase.order'].search(
@@ -152,7 +156,9 @@ class InvActivityReport(models.TransientModel):
                         {'mo_name': mrp_id.name, 'po_name': '', 'po_date': '',
                          'expected_date': expected_date,
                          'qty_in': '',
-                         'qty_out': mrp_id.product_qty, 'avail_inv': total,
+                         'qty_out': '{0:,.2f}'.format(int(mrp_id.product_qty)),
+                         'avail_inv': total,
+                         'avail_inv_str': '{0:,.2f}'.format(abs(int(total))),
                          'partner_name': ''})
                 else:
                     for line in purchase_id.order_line:
@@ -175,8 +181,11 @@ class InvActivityReport(models.TransientModel):
                                 'mo_name': '', 'po_name': line.order_id.name,
                                 'po_date': date_order,
                                 'expected_date': expected_date,
-                                'qty_in': line.product_qty, 'qty_out': '',
+                                'qty_in': '{0:,.2f}'.format(int(
+                                    line.product_qty)), 'qty_out': '',
                                 'avail_inv': total,
+                                'avail_inv_str': '{0:,.2f}'.format(
+                                    abs(int(total))),
                                 'partner_name': line.order_id.partner_id.name})
             cnt += 1
         return report_data_list
@@ -200,12 +209,12 @@ class InvActivityReport(models.TransientModel):
         red = workbook.add_format(
             {'font_color': 'red', 'align': 'right'})
 
-        date_start = datetime.strptime(str(self.date_start),
-            '%Y-%m-%d').strftime('%m/%d/%Y')
+        date_start = datetime.strptime(str(
+            self.date_start), '%Y-%m-%d').strftime('%m/%d/%Y')
         date_end = ''
         if self.date_end:
-            date_end = datetime.strptime(str(self.date_end),
-                '%Y-%m-%d').strftime('%m/%d/%Y')
+            date_end = datetime.strptime(
+                str(self.date_end), '%Y-%m-%d').strftime('%m/%d/%Y')
 
         report_context = self.env.context.get('report_context')
         if report_context == 'finish_goods':
@@ -233,10 +242,12 @@ class InvActivityReport(models.TransientModel):
 
         worksheet.set_column('A:A', 20)
         worksheet.set_column('B:B', 20)
-        worksheet.set_column('C:C', 20)
+        worksheet.set_column('C:C', 17)
         worksheet.set_column('D:D', 15)
+        worksheet.set_column('E:E', 15)
         worksheet.set_column('G:G', 20)
-        worksheet.set_column('H:H', 15)
+        worksheet.set_column('F:F', 15)
+        worksheet.set_column('H:H', 20)
         row = 1
         col = 0
 
@@ -288,10 +299,12 @@ class InvActivityReport(models.TransientModel):
                 worksheet.write(row, index, header, row_header_format)
             row += 1
             if product_id.qty_available < 0:
-                qty = '(' + str(abs(product_id.qty_available)) + ')'
+                qty = '(' + '{0:,.2f}'.format(
+                    abs(product_id.qty_available)) + ')'
                 worksheet.write(row, col + 6, qty, red)
             else:
-                worksheet.write(row, col + 6, product_id.qty_available)
+                worksheet.write(row, col + 6, '{0:,.2f}'.format(
+                    product_id.qty_available), align_right)
 
             for data in data_dict[product_id]:
                 row += 1
@@ -308,13 +321,14 @@ class InvActivityReport(models.TransientModel):
                                     align_right)
                 worksheet.write(row, col + 3, data.get('expected_date'),
                                 align_right)
-                worksheet.write(row, col + 4, data.get('qty_in'))
-                worksheet.write(row, col + 5, data.get('qty_out'))
+                worksheet.write(row, col + 4, data.get('qty_in'), align_right)
+                worksheet.write(row, col + 5, data.get('qty_out'), align_right)
                 if data.get('avail_inv') < 0:
-                    worksheet.write(row, col + 6, '(' + str(
+                    worksheet.write(row, col + 6, '(' + '{0:,.2f}'.format(
                         abs(data.get('avail_inv'))) + ')', red)
                 else:
-                    worksheet.write(row, col + 6, data.get('avail_inv'))
+                    worksheet.write(row, col + 6, '{0:,.2f}'.format(
+                        data.get('avail_inv')), align_right)
                 worksheet.write(row, col + 7, data.get('partner_name'))
 
         workbook.close()

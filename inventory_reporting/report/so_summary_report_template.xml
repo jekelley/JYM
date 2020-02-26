@@ -3,11 +3,11 @@
     <template id="report_so_summary">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-call="web.external_layout">
+                <t t-call="inventory_reporting.activity_layout">
                     <t class="page">
                         <div class="text-center">
-                            <h2>Sale Order Summary Report</h2>
-                            <h4>
+                            <h4>Sale Order Summary Report</h4>
+                            <h6>
                                 <span t-esc="datetime.datetime.strptime(
                             str(o.date_start),
                             '%Y-%m-%d').strftime('%m/%d/%Y')"/>
@@ -17,10 +17,10 @@
                             str(o.date_end),
                             '%Y-%m-%d').strftime('%m/%d/%Y')"/>
                                 </t>
-                            </h4>
+                            </h6>
                         </div>
                         <br/>
-                        <table class="table table-condensed">
+                        <table class="table table-condensed report_style">
                             <thead>
                                 <tr>
                                     <th>SO Number</th>

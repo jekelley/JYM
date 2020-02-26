@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="view_wizard_so_history_form" model="ir.ui.view">
-        <field name="name">wizard.so.history.form</field>
+    <record id="view_wizard_so_history_pdf_form" model="ir.ui.view">
+        <field name="name">wizard.so.history.pdf.form</field>
         <field name="model">wizard.so.history</field>
         <field name="type">form</field>
         <field name="priority" eval="8"/>
         <field name="arch" type="xml">
-            <form string="SO History">
+            <form string="SO History PDF">
                 <group>
                     <group>
                         <field name="date_start" required="1"/>
@@ -24,7 +24,46 @@
                 <footer>
                     <button string='Print PDF' name="print_history_pdf_report"
                             type="object" class="btn-primary"/>
-                    <button string='Print Excel' name="print_history_excel_report"
+                    <button string="Cancel" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record model="ir.actions.act_window"
+            id="action_wizard_so_history_pdf_view">
+        <field name="name">SO History PDF Report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">wizard.so.history</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_wizard_so_history_pdf_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_wizard_so_history_excel_form" model="ir.ui.view">
+        <field name="name">wizard.so.history.excel.form</field>
+        <field name="model">wizard.so.history</field>
+        <field name="type">form</field>
+        <field name="priority" eval="8"/>
+        <field name="arch" type="xml">
+            <form string="SO History Excel">
+                <group>
+                    <group>
+                        <field name="date_start" required="1"/>
+                        <field name="state_all"/>
+                        <field name="state_sent"/>
+                        <field name="state_done"/>
+                    </group>
+                    <group>
+                        <field name="date_end"/>
+                        <field name="state_draft"/>
+                        <field name="state_sale"/>
+                        <field name="state_cancel"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string='Export to Excel' name="print_history_excel_report"
                             type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary"
                             special="cancel"/>
@@ -33,19 +72,24 @@
         </field>
     </record>
     <record model="ir.actions.act_window"
-            id="action_wizard_so_history_view">
-        <field name="name">SO History Report</field>
+            id="action_wizard_so_history_excel_view">
+        <field name="name">SO History Excel Report</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">wizard.so.history</field>
         <field name="view_type">form</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="view_wizard_so_history_form"/>
+        <field name="view_id" ref="view_wizard_so_history_excel_form"/>
         <field name="target">new</field>
     </record>
 
+    <menuitem id="menu_so_history_pdf_report"
+              name="SO History PDF Report"
+              action="action_wizard_so_history_pdf_view"
+              parent="sale.menu_sale_report" sequence="9"/>
+
     <menuitem id="menu_so_history_report"
-              name="SO History Report"
-              action="action_wizard_so_history_view"
-              parent="menu_inv_report" sequence="8"/>
+              name="SO History Excel Report"
+              action="action_wizard_so_history_excel_view"
+              parent="sale.menu_sale_report" sequence="10"/>
 
 </odoo>

@@ -2,21 +2,42 @@
 <odoo>
     <data>
         <report
-                string="Inv - Activity FG Report"
-                id="action_report_inv_activity_fg_report"
-                model="wizard.inv.activity.reports"
-                report_type="qweb-pdf"
-                name="inventory_reporting.report_finish_goods_reports"
-                file="inventory_reporting.report_finish_goods_reports"
+            string="Inv - Activity FG Report"
+            id="action_report_inv_activity_fg_report"
+            model="wizard.inv.activity.reports"
+            report_type="qweb-pdf"
+            name="inventory_reporting.report_finish_goods_reports"
+            file="inventory_reporting.report_finish_goods_reports"
+            paperformat="inventory_reporting.paperformat_so_report"
         />
         <report
-                string="Inv - Activity Component Report"
-                id="action_report_inv_activity_comp_report"
-                model="wizard.inv.activity.reports"
-                report_type="qweb-pdf"
-                name="inventory_reporting.report_component_reports"
-                file="inventory_reporting.report_component_reports"
+            string="Inv - Activity Component Report"
+            id="action_report_inv_activity_comp_report"
+            model="wizard.inv.activity.reports"
+            report_type="qweb-pdf"
+            name="inventory_reporting.report_component_reports"
+            file="inventory_reporting.report_component_reports"
+            paperformat="inventory_reporting.paperformat_so_report"
         />
+        <report
+            string="Inv - Stock By Lot Report"
+            id="action_report_inv_stock_by_lot_report"
+            model="wizard.inv.lot.reports"
+            report_type="qweb-pdf"
+            name="inventory_reporting.report_inv_stock_by_lot_reports"
+            file="inventory_reporting.report_inv_stock_by_lot_reports"
+            paperformat="inventory_reporting.paperformat_so_report"
+        />
+        <report
+            string="Inv - Lot Activity Pdf Report"
+            id="action_report_inv_lot_activity_pdf_report"
+            model="wizard.inv.lot.reports"
+            report_type="qweb-pdf"
+            name="inventory_reporting.report_inv_lot_activity_reports"
+            file="inventory_reporting.report_inv_lot_activity_reports"
+            paperformat="inventory_reporting.paperformat_so_report"
+        />
+
         <report
             id="action_report_so_open_order"
             string="SO Open Order"
@@ -25,6 +46,7 @@
             menu="False"
             file="inventory_reporting.report_so_open_order"
             name="inventory_reporting.report_so_open_order"
+            paperformat="inventory_reporting.paperformat_so_report"
         />
         <report
             id="action_report_so_line_item"
@@ -34,6 +56,7 @@
             menu="False"
             file="inventory_reporting.report_so_line_item"
             name="inventory_reporting.report_so_line_item"
+            paperformat="inventory_reporting.paperformat_so_report"
         />
         <report
             id="action_report_so_summary"
@@ -42,6 +65,7 @@
             report_type="qweb-pdf"
             file="inventory_reporting.report_so_summary"
             name="inventory_reporting.report_so_summary"
+            paperformat="inventory_reporting.paperformat_so_report"
         />
         <report
             id="action_report_so_history"
@@ -50,6 +74,7 @@
             report_type="qweb-pdf"
             file="inventory_reporting.report_so_history"
             name="inventory_reporting.report_so_history"
+            paperformat="inventory_reporting.paperformat_so_report"
         />
     </data>
 </odoo>

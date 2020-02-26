@@ -3,8 +3,8 @@ from odoo import api, models, _
 from odoo.exceptions import UserError
 
 
-class ReportInvActivityFGReports(models.AbstractModel):
-    _name = 'report.inventory_reporting.report_finish_goods_reports'
+class ReportStockByLotReports(models.AbstractModel):
+    _name = 'report.inventory_reporting.report_inv_stock_by_lot_reports'
 
     @api.model
     def _get_report_values(self, docids, data=None):
@@ -19,7 +19,7 @@ class ReportInvActivityFGReports(models.AbstractModel):
                 raise UserError(_(
                     'The category of the selected product does not match '
                     'with the selected category.'))
-            rec = self.env['wizard.inv.activity.reports'].get_data_dict(
+            rec = self.env['wizard.inv.lot.reports'].get_lot_data_dict(
                 product_id, data['form']['date_start'],
                 data['form']['date_end'],
                 data.get('context').get('report_context'))
@@ -31,7 +31,7 @@ class ReportInvActivityFGReports(models.AbstractModel):
             product_ids = self.env['product.product'].search(
                 [('categ_id', '=', data['form']['item_categ'][0])])
             for product in product_ids:
-                rec = self.env['wizard.inv.activity.reports'].get_data_dict(
+                rec = self.env['wizard.inv.lot.reports'].get_lot_data_dict(
                     product, data['form']['date_start'],
                     data['form']['date_end'],
                     data.get('context').get('report_context'))
@@ -46,7 +46,7 @@ class ReportInvActivityFGReports(models.AbstractModel):
                     [('categ_id', '=', categ_id.id)])
                 for product in product_ids:
                     rec = self.env[
-                        'wizard.inv.activity.reports'].get_data_dict(
+                        'wizard.inv.lot.reports'].get_lot_data_dict(
                         product, data['form']['date_start'],
                         data['form']['date_end'],
                         data.get('context').get('report_context'))
@@ -54,10 +54,10 @@ class ReportInvActivityFGReports(models.AbstractModel):
                         data_dict.update({product: rec})
             if not data_dict:
                 raise UserError(_('No records found'))
-        data.update({'inv_data': data_dict})
+        data.update({'product_data': data_dict})
         return {
             'doc_ids': docids,
-            'doc_model': 'wizard.inv.activity.reports',
-            'docs': self.env['wizard.inv.activity.reports'].browse(docids),
+            'doc_model': 'wizard.inv.lot.reports',
+            'docs': self.env['wizard.inv.lot.reports'].browse(docids),
             'data': data
         }
