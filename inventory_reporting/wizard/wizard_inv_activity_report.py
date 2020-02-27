@@ -288,6 +288,7 @@ class InvActivityReport(models.TransientModel):
                         data_dict.update({product: rec})
             if not data_dict:
                 raise UserError(_('No records found'))
+        display_header = True
         for product_id in data_dict:
             row += 2
             worksheet.set_row(row, 20)
@@ -295,8 +296,10 @@ class InvActivityReport(models.TransientModel):
             worksheet.write(row, col + 1, product_id.default_code,
                             header_format)
             row += 1
-            for index, header in enumerate(header_str, start=0):
-                worksheet.write(row, index, header, row_header_format)
+            if display_header:
+                for index, header in enumerate(header_str, start=0):
+                    worksheet.write(row, index, header, row_header_format)
+                display_header = False
             row += 1
             if product_id.qty_available < 0:
                 qty = '(' + '{0:,.2f}'.format(

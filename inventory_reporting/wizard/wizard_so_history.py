@@ -123,7 +123,7 @@ class SOHistory(models.TransientModel):
             date_end = datetime.strptime(str(self.date_end),
                                          '%Y-%m-%d').strftime('%m/%d/%Y')
 
-        worksheet = workbook.add_worksheet('SO Summary')
+        worksheet = workbook.add_worksheet('SO History')
         worksheet.merge_range(
             0, 0, 0, 6, 'Sales Order History Report', title_format)
         worksheet.merge_range(
@@ -192,7 +192,7 @@ class SOHistory(models.TransientModel):
             fp.seek(0)
             result = base64.b64encode(fp.read())
             attachment_obj = self.env['ir.attachment']
-            filename = 'SO Summary'
+            filename = 'SO History'
             attachment_id = attachment_obj.create(
                 {'name': filename,
                  'datas_fname': filename,

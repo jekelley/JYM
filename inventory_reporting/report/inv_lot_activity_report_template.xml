@@ -18,46 +18,51 @@
                             </t>
                         </h6>
                     </div>
+
+                    <t t-set="display_header" t-value="True"/>
                     <t t-foreach="data['lot_data']" t-as="lot">
                         <br/>
                         <b>Lot Number - <span t-esc="lot.name"/>
                         </b>
 
                         <table class="table table-condensed report_style">
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>SKU</th>
-                                    <th>Date</th>
-                                    <th>Partner</th>
-                                    <th>Num</th>
-                                    <th>Quantity</th>
-                                    <th>Balance</th>
-                                </tr>
-                            </thead>
+                            <t t-if="display_header">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th>Type</th>
+                                        <th>SKU</th>
+                                        <th>Date</th>
+                                        <th>Partner</th>
+                                        <th>Num</th>
+                                        <th>Quantity</th>
+                                        <th>Balance</th>
+                                    </tr>
+                             </thead>
+                                <t t-set="display_header" t-value="False"/>
+                            </t>
                             <tbody class="lot_tbody">
                                 <t t-foreach="data['lot_data'][lot]"
                                    t-as="rec">
                                     <tr width="100%">
-                                        <td>
+                                        <td width="10%">
                                             <span t-esc="rec['type']"/>
                                         </td>
-                                        <td class="text-right">
+                                        <td width="13%" class="text-right">
                                             <span t-esc="rec['sku']"/>
                                         </td>
-                                        <td>
+                                        <td width="10%">
                                             <span t-esc="rec['date']"/>
                                         </td>
-                                        <td>
+                                        <td width="22%">
                                             <span t-esc="rec['partner']"/>
                                         </td>
-                                        <td>
+                                        <td width="20%">
                                             <span t-esc="rec['num']"/>
                                         </td>
-                                        <td class="text-right">
+                                        <td width="10%" class="text-right">
                                             <span t-esc="rec['qty']"/>
                                         </td>
-                                        <td class="text-right">
+                                        <td width="15%" class="text-right">
                                             <span t-esc="rec['balance']"/>
                                         </td>
                                     </tr>

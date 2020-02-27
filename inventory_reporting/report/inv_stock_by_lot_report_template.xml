@@ -18,62 +18,66 @@
                             </t>
                         </h6>
                     </div>
+                    <t t-set="display_header" t-value="True"/>
                     <t t-foreach="data['product_data']" t-as="product">
                         <br/>
                         <b><span t-esc="product.name"/> - <span t-esc="product.default_code"/>
                         </b>
 
                         <table class="table table-condensed report_style">
+                            <t t-if="display_header">
                             <thead>
                                 <tr>
-                                    <th>Lot</th>
-                                    <th>Quantity</th>
-                                    <th>Manufactured</th>
-                                    <th>Expires</th>
-                                    <th>Months Remaining</th>
-                                    <th>Shelf Life</th>
-                                    <th>Value</th>
+                                    <th width="10%">Lot</th>
+                                    <th width="13%">Quantity</th>
+                                    <th width="15%">Manufactured</th>
+                                    <th width="10%">Expires</th>
+                                    <th width="10%">Months Remaining</th>
+                                    <th width="10%">Shelf Life</th>
+                                    <th width="10%">Value</th>
                                 </tr>
                             </thead>
+                            <t t-set="display_header" t-value="False"/>
+                            </t>
                             <tbody class="lot_tbody">
                                 <t t-foreach="data['product_data'][product]"
                                    t-as="rec">
-                                    <tr width="100%">
-                                        <td>
+                                    <tr >
+                                        <td width="10%">
                                             <span t-esc="rec['lot_name']"/>
                                         </td>
-                                        <td class="text-right">
+                                        <td width="13%" class="text-right">
                                             <span t-esc="rec['lot_qty']"/>
                                         </td>
-                                        <td>
+                                        <td width="15%">
                                             <span t-esc="rec['manufacturing_date']"/>
                                         </td>
-                                        <td>
+                                        <td width="10%">
                                             <span t-esc="rec['expire_date']"/>
                                         </td>
                                         <t t-if="rec['month_rem'] &lt; 0">
                                             <td class="text-right"
-                                                style="color:red;">(<span
+                                                style="color:red;" width="10%">(<span
                                                     t-esc="rec['month_rem_str']"/>)
                                             </td>
                                         </t>
                                         <t t-if="rec['month_rem'] &gt; 0 or rec['month_rem'] == 0.0">
-                                            <td class="text-right">
+                                            <td class="text-right" width="10%">
                                                 <span t-esc="rec['month_rem_str']"/>
                                             </td>
                                         </t>
                                         <t t-if="rec['shelf_life'] &lt; 0">
                                             <td class="text-right"
-                                                style="color:red;">(<span
+                                                style="color:red;" width="10%">(<span
                                                     t-esc="rec['shelf_life_str']"/>)
                                             </td>
                                         </t>
                                         <t t-if="rec['shelf_life'] &gt; 0 or rec['shelf_life'] == 0.0">
-                                            <td class="text-right">
+                                            <td class="text-right" width="10%">
                                                 <span t-esc="rec['shelf_life_str']"/>
                                             </td>
                                         </t>
-                                        <td class="text-right">
+                                        <td class="text-right" width="10%">
                                             <span t-esc="rec['value']" />
                                         </td>
                                     </tr>

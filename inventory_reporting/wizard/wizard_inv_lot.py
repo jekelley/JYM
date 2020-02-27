@@ -70,13 +70,18 @@ class InvLotActivityReport(models.TransientModel):
             return report_data_list
         else:
             report_data_list = []
-            domain = [('x_studio_lot_number', '=', fetch_id.id),
-                      ('date_planned_start', '>=', st_dt),
-                      ('state', '=', 'done')]
-            inv_domain = ['|', ('x_studio_lotref', '=', fetch_id.name),
-                          ('x_studio_lot', '=', fetch_id.name),
-                          ('invoice_id.date_invoice', '>=', st_dt),
-                          ('invoice_id.state', '=', 'open')]
+            domain = [
+                ('x_studio_lot_number', '=', fetch_id.id),
+                ('date_planned_start', '>=', st_dt),
+                ('state', 'in', ['planned', 'progress', 'confirmed'])
+            ]
+            inv_domain = [
+                '|',
+                ('x_studio_lotref', '=', fetch_id.name),
+                ('x_studio_lot', '=', fetch_id.name),
+                ('invoice_id.date_invoice', '>=', st_dt),
+                ('invoice_id.state', 'in', ['open', 'in_payment', 'paid'])
+            ]
             if date_end:
                 end_dt = fields.Datetime.from_string(date_end) + timedelta(
                     days=1)
@@ -199,6 +204,7 @@ class InvLotActivityReport(models.TransientModel):
                         data_dict.update({product: rec})
             if not data_dict:
                 raise UserError(_('No records found'))
+        display_header = True
         for product_id in data_dict:
             row += 2
             worksheet.set_row(row, 30)
@@ -206,16 +212,18 @@ class InvLotActivityReport(models.TransientModel):
             worksheet.write(row, col + 1, product_id.default_code,
                             header_format)
             row += 1
-            for index, header in enumerate(header_str, start=0):
-                worksheet.write(row, index, header, row_header_format)
+            if display_header:
+                for index, header in enumerate(header_str, start=0):
+                    worksheet.write(row, index, header, row_header_format)
+                display_header = False
 
             for data in data_dict[product_id]:
                 row += 1
 
                 if report_context == 'by_lot':
                     worksheet.write(row, col, data.get('lot_name'))
-                    worksheet.write(row, col + 1, data.get('lot_qty'),
-                                    align_right)
+                    worksheet.write(
+                        row, col + 1, data.get('lot_qty'), align_right)
                     worksheet.write(row, col + 2,
                                     data.get('manufacturing_date'),
                                     align_right)
@@ -236,17 +244,11 @@ class InvLotActivityReport(models.TransientModel):
                             align_right)
                     worksheet.write(row, col + 6, data.get('value'),
                                     align_right)
-
         workbook.close()
         fp.seek(0)
         result = base64.b64encode(fp.read())
         attachment_obj = self.env['ir.attachment']
-
-        if report_context == 'by_lot':
-            filename = 'Inventory Stock By Lot'
-        else:
-            filename = 'Inventory Lot Activity'
-
+        filename = 'Inventory Stock By Lot'
         attachment_id = attachment_obj.create(
             {'name': filename,
              'datas_fname': filename,
@@ -298,10 +300,10 @@ class InvLotActivityReport(models.TransientModel):
             header_str = [
                 'Type', 'SKU', 'Date', 'Partner', 'Num', 'Qty', 'Balance']
 
-            worksheet.set_column('A:A', 25)
-            worksheet.set_column('B:B', 20)
-            worksheet.set_column('C:C', 17)
-            worksheet.set_column('D:D', 15)
+            worksheet.set_column('A:A', 15)
+            worksheet.set_column('B:B', 15)
+            worksheet.set_column('C:C', 15)
+            worksheet.set_column('D:D', 25)
             worksheet.set_column('E:E', 20)
             worksheet.set_column('G:G', 15)
             worksheet.set_column('F:F', 15)
@@ -369,15 +371,16 @@ class InvLotActivityReport(models.TransientModel):
                     data_dict.update({lot_id: rec})
             if not data_dict:
                 raise UserError(_('No records found'))
-
+        display_header = True
         for lot_id in data_dict:
             row += 2
             worksheet.set_row(row, 30)
             worksheet.write(row, col, lot_id.name, header_format)
             row += 1
-            for index, header in enumerate(header_str, start=0):
-                worksheet.write(row, index, header, row_header_format)
-
+            if display_header:
+                for index, header in enumerate(header_str, start=0):
+                    worksheet.write(row, index, header, row_header_format)
+                display_header = False
             for data in data_dict[lot_id]:
                 row += 1
                 worksheet.write(row, col, data.get('type'))

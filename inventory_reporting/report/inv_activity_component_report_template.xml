@@ -18,6 +18,7 @@
                             </t>
                         </h6>
                     </div>
+                    <t t-set="display_header" t-value="True"/>
                     <t t-foreach="data['inv_data']" t-as="inv">
                         <br/>
                         <b>Item Number -
@@ -25,6 +26,7 @@
                         </b>
 
                         <table class="table table-condensed report_style">
+                            <t t-if="display_header">
                             <thead>
                                 <tr>
                                     <th>Purchase Order</th>
@@ -37,6 +39,8 @@
                                     <th>Partner</th>
                                 </tr>
                             </thead>
+                            <t t-set="display_header" t-value="False"/>
+                            </t>
                             <tbody class="mrp_sale_tbody">
                                 <tr>
                                     <td></td>
@@ -61,32 +65,32 @@
                                 <t t-foreach="data['inv_data'][inv]"
                                    t-as="rec">
                                     <tr width="100%">
-                                        <td>
+                                        <td width="10%">
                                             <span t-esc="rec['po_name']"/>
                                         </td>
-                                        <td>
+                                        <td width="13%">
                                             <span t-esc="rec['mo_name']"/>
                                         </td>
-                                        <td>
+                                        <td width="10%">
                                             <span t-esc="rec['po_date']"/>
                                         </td>
-                                        <td>
+                                        <td  width="15%">
                                             <span t-esc="rec['expected_date']"/>
                                         </td>
                                         <td class="text-right">
                                             <span t-esc="rec['qty_in']"/>
                                         </td>
-                                        <td class="text-right">
+                                        <td width="10%" class="text-right">
                                             <span t-esc="rec['qty_out']"/>
                                         </td>
                                         <t t-if="rec['avail_inv'] &lt; 0">
                                             <td class="text-right"
-                                                style="color:red;">(
+                                                style="color:red;" width="10%">(
                                                 <span t-esc="rec['avail_inv_str']"/>)
                                             </td>
                                         </t>
                                         <t t-if="rec['avail_inv'] &gt; 0 or rec['avail_inv'] == 0.0">
-                                            <td class="text-right">
+                                            <td class="text-right" width="10%">
                                                 <span t-esc="rec['avail_inv_str']"/>
                                             </td>
                                         </t>
