@@ -111,7 +111,9 @@ class account_payment(models.Model):
                 for line in rec.invoice_lines:
                     amt += line.allocation
                     if line.allocation <= 0:
+                        rec['invoice_ids'] = (3, line.invoice_id)
                         line.unlink()
+                
                 if rec.amount < amt:
                     raise ValidationError(("Payment amount must be greater then or equal to '%s'") %(amt))
                 if rec.amount > amt:
