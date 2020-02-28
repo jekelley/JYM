@@ -20,7 +20,6 @@
                     </div>
                     <t t-set="display_header" t-value="True"/>
                     <t t-foreach="data['inv_data']" t-as="inv">
-                        <br/>
                         <b>Item Number -
                             <span t-esc="inv.default_code"/>
                         </b>
@@ -85,8 +84,8 @@
                                         </td>
                                         <t t-if="rec['avail_inv'] &lt; 0">
                                             <td class="text-right"
-                                                style="color:red;" width="10%">(
-                                                <span t-esc="rec['avail_inv_str']"/>)
+                                                style="color:red;" width="10%">
+                                                (<span t-esc="rec['avail_inv_str']"/>)
                                             </td>
                                         </t>
                                         <t t-if="rec['avail_inv'] &gt; 0 or rec['avail_inv'] == 0.0">

@@ -20,60 +20,61 @@
                             </h6>
                         </div>
                         <br/>
+                        <t t-set="display_header" t-value="True"/>
                         <t t-foreach="o.get_data()" t-as="so_info">
-                            <br/>
                             <b>Sale Order Number - </b>
                                 <t t-esc="so_info['order'].name"/>
-                            &#160;
                             <b>PO Number - </b>
                                 <t t-esc="so_info['order'].client_order_ref"/>
-                            &#160;
                             <b>Customer - </b>
                                 <t t-esc="so_info['order'].partner_id.name"/>
 
                             <table class="table table-condensed report_style">
+                                <t t-if="display_header">
                                 <thead>
                                     <tr>
-                                        <th>Product</th>
-                                        <th>Description</th>
-                                        <th>Req. Date</th>
-                                        <th>Ordered Qty</th>
-                                        <th>Ship Qty</th>
-                                        <th>Onhand Qty</th>
-                                        <th>Open Qty</th>
-                                        <th>Rate</th>
-                                        <th>Total</th>
+                                        <th width="10%">Product</th>
+                                        <th width="30%">Description</th>
+                                        <th width="9%">Req. Date</th>
+                                        <th width="8%">Ordered Qty</th>
+                                        <th width="8%">Ship Qty</th>
+                                        <th width="8%">Onhand Qty</th>
+                                        <th width="8%">Open Qty</th>
+                                        <th width="7%">Rate</th>
+                                        <th width="20%">Total</th>
                                     </tr>
                                 </thead>
+                                <t t-set="display_header" t-value="False"/>
+                                </t>
                                 <tbody>
                                     <t t-foreach="so_info['lines']"
                                        t-as="line">
                                         <tr>
-                                            <td>
+                                            <td width="10%">
                                                 <span t-esc="line['name'].default_code"/>
                                             </td>
-                                            <td width="20%">
+                                            <td width="30%">
                                                 <span t-esc="line['description']"/>
                                             </td>
-                                            <td class="text-right">
+                                            <td width="9%" class="text-right">
                                                 <span t-esc="line['req_date']"/>
                                             </td>
-                                            <td class="text-right">
+                                            <td width="8%" class="text-right">
                                                 <span t-esc="line['order_qty']"/>
                                             </td>
-                                            <td class="text-right">
+                                            <td width="8%" class="text-right">
                                                 <span t-esc="line['ship_qty']"/>
                                             </td>
-                                            <td class="text-right">
+                                            <td width="8%" class="text-right">
                                                 <span t-esc="line['on_hand']"/>
                                             </td>
-                                            <td class="text-right">
+                                            <td width="8%" class="text-right">
                                                 <span t-esc="line['open_qty']"/>
                                             </td>
-                                            <td class="text-right">
+                                            <td width="7%" class="text-right">
                                                 <span t-esc="line['rate']"/>
                                             </td>
-                                            <td class="text-right">
+                                            <td width="20%" class="text-right">
                                                 <span t-esc="line['total']"/>
                                             </td>
                                         </tr>

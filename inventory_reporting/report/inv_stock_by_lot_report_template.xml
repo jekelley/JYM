@@ -20,10 +20,8 @@
                     </div>
                     <t t-set="display_header" t-value="True"/>
                     <t t-foreach="data['product_data']" t-as="product">
-                        <br/>
                         <b><span t-esc="product.name"/> - <span t-esc="product.default_code"/>
                         </b>
-
                         <table class="table table-condensed report_style">
                             <t t-if="display_header">
                             <thead>

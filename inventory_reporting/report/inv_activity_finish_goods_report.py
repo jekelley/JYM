@@ -5,6 +5,7 @@ from odoo.exceptions import UserError
 
 class ReportInvActivityFGReports(models.AbstractModel):
     _name = 'report.inventory_reporting.report_finish_goods_reports'
+    _description = 'Report for Inventory Finish Goods Report'
 
     @api.model
     def _get_report_values(self, docids, data=None):
