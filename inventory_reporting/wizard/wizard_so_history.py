@@ -148,6 +148,7 @@ class SOHistory(models.TransientModel):
         data_list = self.get_data()
 
         if data_list:
+            display_header = True
             for data in data_list:
                 row += 2
                 worksheet.set_row(row, 28)
@@ -163,8 +164,10 @@ class SOHistory(models.TransientModel):
                                 'Customer - ' + data['order'].partner_id.name,
                                 header_format)
                 row += 1
-                for index, header in enumerate(header_str, start=0):
-                    worksheet.write(row, index, header, row_header_format)
+                if display_header:
+                    for index, header in enumerate(header_str, start=0):
+                        worksheet.write(row, index, header, row_header_format)
+                    display_header = False
 
                 for lines in data['lines']:
                     row += 1

@@ -21,10 +21,8 @@
 
                     <t t-set="display_header" t-value="True"/>
                     <t t-foreach="data['lot_data']" t-as="lot">
-                        <br/>
                         <b>Lot Number - <span t-esc="lot.name"/>
                         </b>
-
                         <table class="table table-condensed report_style">
                             <t t-if="display_header">
                                 <thead>

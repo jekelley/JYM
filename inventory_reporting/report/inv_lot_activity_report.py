@@ -5,6 +5,7 @@ from odoo.exceptions import UserError
 
 class ReportLotActivityReports(models.AbstractModel):
     _name = 'report.inventory_reporting.report_inv_lot_activity_reports'
+    _description = 'Report for Inventory Lot Activity Report'
 
     @api.model
     def _get_report_values(self, docids, data=None):
