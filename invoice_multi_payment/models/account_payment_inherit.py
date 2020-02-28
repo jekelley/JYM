@@ -115,9 +115,9 @@ class account_payment(models.Model):
                         line.unlink()
                 
                 if rec.amount < amt:
-                    raise ValidationError(("Total allocated amount and Payment amount are not equal. Payment amount is equal to " + str(rec.amount) + " and Total allocated amount is equal to '%s'") %(amt))
+                    raise ValidationError(("Total allocated amount and Payment amount are not equal. Payment amount is equal to " + str(rec.amount) + " and Total allocated amount is equal to %s") %(amt))
                 if rec.amount > amt:
-                    raise ValidationError(("Total allocated amount and Payment amount are not equal. Payment amount is equal to " + str(rec.amount) + " and Total allocated amount is equal to '%s'") %(amt))
+                    raise ValidationError(("Total allocated amount and Payment amount are not equal. Payment amount is equal to " + str(rec.amount) + " and Total allocated amount is equal to %s") %(amt))
         return  super(account_payment,self).post()
             
 
