@@ -111,7 +111,11 @@ class account_payment(models.Model):
                 for line in rec.invoice_lines:
                     amt += line.allocation
                     if line.allocation <= 0:
-                        rec['invoice_ids'] = (3, line.invoice_id.id)
+                        # rec['invoice_ids'] = (3, line.invoice_id.id)
+                        rec.invoice_ids.search(['id','=',line.invoice_id.id])[0].unlink()
+                        # for invoice in rec.invoice_ids:
+                        #     if invoice.id == line.invoice_id.id:
+                        #         invoice.unlink()
                         line.unlink()
                 
                 if rec.amount < amt:
