@@ -144,15 +144,11 @@ class account_payment(models.Model):
                                           self.company_id.currency_id,
                                           )
 
-            # Write line corresponding to invoice payment
+           
             counterpart_aml_dict =\
                 self._get_shared_move_line_vals(debit,
                                                 credit, amount_currency,
                                                 move.id, False)
-            counterpart_aml_dict.update(
-                self._get_counterpart_move_line_vals(self.invoice_ids[0]))
-            counterpart_aml_dict.update({'currency_id': currency_id})
-            counterpart_aml = aml_obj.create(counterpart_aml_dict)
 
             for inv in self.invoice_ids:
                 amt = 0
@@ -176,6 +172,13 @@ class account_payment(models.Model):
                     _compute_amount_fields(amt, self.currency_id,
                                           self.company_id.currency_id,
                                           )
+
+                # Write line corresponding to invoice payment
+                counterpart_aml_dict.update(
+                    self._get_counterpart_move_line_vals(self.invoice_ids[0]))
+                counterpart_aml_dict.update({'currency_id': currency_id})
+                counterpart_aml = aml_obj.create(counterpart_aml_dict)
+
                
                 # Reconcile with the invoices and write off
                 if self.partner_type == 'customer':
