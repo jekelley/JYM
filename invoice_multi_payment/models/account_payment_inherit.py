@@ -140,7 +140,7 @@ class account_payment(models.Model):
 
             debit, credit, amount_currency, currency_id =\
                     aml_obj.with_context(date=self.payment_date).\
-                    _compute_amount_fields(amt, self.currency_id,
+                    _compute_amount_fields(amount, self.currency_id,
                                           self.company_id.currency_id,
                                           )
 
