@@ -138,18 +138,7 @@ class account_payment(models.Model):
             move = self.env['account.move'].create(self._get_move_vals())
             p_id = str(self.partner_id.id)
 
-            debit, credit, amount_currency, currency_id =\
-                    aml_obj.with_context(date=self.payment_date).\
-                    _compute_amount_fields(amount, self.currency_id,
-                                          self.company_id.currency_id,
-                                          )
-
            
-            counterpart_aml_dict =\
-                self._get_shared_move_line_vals(debit,
-                                                credit, amount_currency,
-                                                move.id, False)
-
             for inv in self.invoice_ids:
                 amt = 0
                 if self.partner_type == 'customer':
@@ -213,16 +202,22 @@ class account_payment(models.Model):
                         counterpart_aml['amount_currency'] -=\
                             amount_currency_wo
                 inv.register_payment(counterpart_aml)
-                # Write counterpart lines
-                if not self.currency_id != self.company_id.currency_id:
-                    amount_currency = 0
-                liquidity_aml_dict =\
-                    self._get_shared_move_line_vals(credit, debit,
-                                                    -amount_currency, move.id,
-                                                    False)
-                liquidity_aml_dict.update(
-                    self._get_liquidity_move_line_vals(-amount))
-                aml_obj.create(liquidity_aml_dict)
+
+            debit, credit, amount_currency, currency_id =\
+                    aml_obj.with_context(date=self.payment_date).\
+                    _compute_amount_fields(amount, self.currency_id,
+                                          self.company_id.currency_id,
+                                          )
+            # Write counterpart lines
+            if not self.currency_id != self.company_id.currency_id:
+                amount_currency = 0
+            liquidity_aml_dict =\
+                self._get_shared_move_line_vals(credit, debit,
+                                                -amount_currency, move.id,
+                                                False)
+            liquidity_aml_dict.update(
+                self._get_liquidity_move_line_vals(-amount))
+            aml_obj.create(liquidity_aml_dict)    
             move.post()
             return move
 
