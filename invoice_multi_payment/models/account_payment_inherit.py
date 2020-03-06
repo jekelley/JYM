@@ -163,6 +163,11 @@ class account_payment(models.Model):
                                           )
 
                 # Write line corresponding to invoice payment
+                counterpart_aml_dict =\
+                    self._get_shared_move_line_vals(debit,
+                                                    credit, amount_currency,
+                                                    move.id, False)
+
                 counterpart_aml_dict.update(
                     self._get_counterpart_move_line_vals(self.invoice_ids[0]))
                 counterpart_aml_dict.update({'currency_id': currency_id})
