@@ -149,8 +149,8 @@ class account_payment(models.Model):
                 self._get_shared_move_line_vals(debit,
                                                 credit, amount_currency,
                                                 move.id, False)
-            # counterpart_aml_dict.update(
-            #     self._get_counterpart_move_line_vals(inv))
+            counterpart_aml_dict.update(
+                self._get_counterpart_move_line_vals(self.invoice_ids[0]))
             counterpart_aml_dict.update({'currency_id': currency_id})
             counterpart_aml = aml_obj.create(counterpart_aml_dict)
 
