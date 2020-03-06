@@ -93,10 +93,10 @@ odoo.define('cap_account_reconciliation.ReconciliationRenderer', function (requi
 //                         .attr("data-content", qweb.render('reconciliation.line.mv_line.details', {'line': line}));
 //                 }
                 // ADD RENDERED PROPOSITION TO THE MATCH TABLE
-                if ($line.already_reconciled) {
+                // if ($line.already_reconciled) {
 
-                    $mv_lines.append($line);
-                }
+                //     $mv_lines.append($line);
+                // }
             });
         },
 
