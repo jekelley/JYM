@@ -25,7 +25,7 @@ class AccountReconciliationWidget(models.AbstractModel):
 #             ids.append(account_move_line_id.id)
 
         
-        str_domain = ["account_id.id", "=", 260)] + str_domain
+        str_domain = [("account_id.id", "=", 260)] + str_domain
         _logger.info("domain" + str(str_domain))
 #
         
