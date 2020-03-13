@@ -21,7 +21,8 @@ class AccountReconciliationWidget(models.AbstractModel):
         
 #         for account_move_line_id in self.env['account.move.line'].search(domain):
 #             ids.append(account_move_line_id.id)
-        str_domain = ["|", ("x_channel_name", "ilike", search_str)] + str_domain
 
+        str_domain = ["account_id.id", "=", 263)] + str_domain
+#
         
         return str_domain
