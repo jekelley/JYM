@@ -15,7 +15,6 @@ class AccountReconciliation(AccountReconciliation):
 
     @api.model
     def get_move_lines_for_bank_statement_line(self, st_line_id, partner_id=None, excluded_ids=None, search_str=False, offset=0, limit=None):
-        a = 6 /0
         """ Returns move lines for the bank statement reconciliation widget,
             formatted as a list of dicts
             :param st_line_id: ids of the statement lines
@@ -40,6 +39,7 @@ class AccountReconciliation(AccountReconciliation):
             partner_id = st_line.partner_id.id
 
         domain = self._domain_move_lines_for_reconciliation(st_line, aml_accounts, partner_id, excluded_ids=excluded_ids, search_str=search_str)
+        domain = [("account_id.id", "=", 260)] + domain
         recs_count = self.env['account.move.line'].search_count(domain)
         aml_recs = self.env['account.move.line'].search(domain, offset=offset, limit=limit, order="date_maturity desc, id desc")
         target_currency = st_line.currency_id or st_line.journal_id.currency_id or st_line.journal_id.company_id.currency_id
