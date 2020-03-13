@@ -5,10 +5,11 @@ import re
 import logging
 
 from odoo import api, models
+from odoo.addons.account.models.reconciliation_widget import AccountReconciliation
 
 _logger = logging.getLogger(__name__)
 
-class AccountReconciliationWidget(models.AbstractModel):
+class AccountReconciliation(AccountReconciliation):
     """Manage 'account.reconciliation.widget' model. Overriding model."""
     _inherit = "account.reconciliation.widget"
 
