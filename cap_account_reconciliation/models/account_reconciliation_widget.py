@@ -14,6 +14,7 @@ class AccountReconciliationWidget(models.AbstractModel):
 
     @api.model
     def _domain_move_lines(self, search_str):
+        a = 6 /0
         """Returns the domain from the search_str search. Overriding method."""
         # CALL SUPER
         str_domain = super(AccountReconciliationWidget, self)._domain_move_lines(search_str=search_str)
