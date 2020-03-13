@@ -39,7 +39,7 @@ class AccountReconciliation(AccountReconciliation):
             partner_id = st_line.partner_id.id
 
         domain = self._domain_move_lines_for_reconciliation(st_line, aml_accounts, partner_id, excluded_ids=excluded_ids, search_str=search_str)
-        domain.append(("account_id.id", "=", 260))
+        domain.append(("account_id", "in", aml_accounts))
         _logger.info("domain" + str(domain))
         recs_count = self.env['account.move.line'].search_count(domain)
         aml_recs = self.env['account.move.line'].search(domain, offset=offset, limit=limit, order="date_maturity desc, id desc")
