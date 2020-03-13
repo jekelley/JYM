@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 
 class AccountReconciliation(AccountReconciliation):
     """Manage 'account.reconciliation.widget' model. Overriding model."""
-    _inherit = "account.reconciliation.widget"
+#     _inherit = "account.reconciliation.widget"
 
     @api.model
     def get_move_lines_for_bank_statement_line(self, st_line_id, partner_id=None, excluded_ids=None, search_str=False, offset=0, limit=None):
