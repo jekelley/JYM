@@ -114,9 +114,9 @@ class account_payment(models.Model):
                         rec['invoice_ids'] = [(3, line.invoice_id.id)]
                         line.unlink()
                 
-                if rec.amount < amt:
+                if round(rec.amount, 2) < round(amt, 2):
                     raise ValidationError(("Total allocated amount and Payment amount are not equal. Payment amount is equal to " + str(rec.amount) + " and Total allocated amount is equal to %s") %(amt))
-                if rec.amount > amt:
+                if round(rec.amount, 2) > round(amt, 2):
                     raise ValidationError(("Total allocated amount and Payment amount are not equal. Payment amount is equal to " + str(rec.amount) + " and Total allocated amount is equal to %s") %(amt))
         return  super(account_payment,self).post()
             
