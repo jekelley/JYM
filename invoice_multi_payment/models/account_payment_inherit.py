@@ -255,6 +255,7 @@ class PaymentInvoiceLine(models.Model):
     total_amount = fields.Float(string='Total Amount', compute='_get_invoice_data', store=True)
     open_amount = fields.Float(string='Due Amount', compute='_get_invoice_data', store=True)
     allocation = fields.Float(string='Allocation Amount')
+    discount = fields.Float(string='Discount Amount')
     
     @api.multi
     @api.depends('invoice_id')
