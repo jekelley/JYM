@@ -113,6 +113,34 @@ class account_payment(models.Model):
                     if line.allocation <= 0:
                         rec['invoice_ids'] = [(3, line.invoice_id.id)]
                         line.unlink()
+                    # Add a discount line to every invoice with a discount
+                    if line.discount > 0:
+                        amount = 100
+  
+                        invoice = line.invoice_id
+                        entry = invoice.move_id
+                        pre_amount = invoice.amount_total
+                        payments = invoice.payment_ids
+                        
+                        invoice.action_invoice_cancel
+                        invoice['state'] = 'draft'
+                        self.env.cr.commit()
+                        
+                        self.env['account.invoice.line'].create({
+                            'name': 'Discount of $' + str(amount),
+                            'quantity': 1,
+                            'price_unit': -1 * amount,
+                            'invoice_id': invoice.id,
+                            'account_id': 17,
+                        })
+                        invoice['residual'] = invoice.residual - amount
+                        
+                        self.env.cr.commit()
+                        
+                        invoice['payment_ids'] = payments
+                        env.cr.commit()
+                        
+                        record.action_invoice_open
                 
                 if round(rec.amount, 2) < round(amt, 2):
                     raise ValidationError(("Total allocated amount and Payment amount are not equal. Payment amount is equal to " + str(rec.amount) + " and Total allocated amount is equal to %s") %(amt))
