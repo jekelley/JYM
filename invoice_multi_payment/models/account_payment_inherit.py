@@ -138,9 +138,9 @@ class account_payment(models.Model):
                         self.env.cr.commit()
                         
                         invoice['payment_ids'] = payments
-                        env.cr.commit()
+                        self.env.cr.commit()
                         
-                        record.action_invoice_open
+                        invoice.action_invoice_open
                 
                 if round(rec.amount, 2) < round(amt, 2):
                     raise ValidationError(("Total allocated amount and Payment amount are not equal. Payment amount is equal to " + str(rec.amount) + " and Total allocated amount is equal to %s") %(amt))
