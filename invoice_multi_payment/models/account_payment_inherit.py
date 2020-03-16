@@ -136,7 +136,7 @@ class account_payment(models.Model):
                         invoice['residual'] = invoice.residual - amount
                         
                         self.env.cr.commit()
-                        invoice.action_invoice_open
+                        invoice.post()
                         # invoice['payment_ids'] = payments
                         # self.env.cr.commit()
                 
