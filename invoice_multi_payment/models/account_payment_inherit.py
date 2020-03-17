@@ -111,34 +111,73 @@ class account_payment(models.Model):
                 for line in rec.invoice_lines:
                     if line.discount > 0:
                         amount = line.discount
-  
-                        invoice = line.invoice_id
-                        entry = invoice.move_id
-                        pre_amount = invoice.amount_total
-                        payments = invoice.payment_ids
+
+                        # amount = 100
+
+                        record = line.invoice_id
                         
-                        invoice.action_invoice_cancel()
-                        invoice['state'] = 'draft'
-                        self.env.cr.commit()
+                        pre_amount = record.amount_total
                         
-                        self.env['account.invoice.line'].create({
+                        payments = []
+                        for p in record.payment_ids:
+                            payments.append(p.id)
+                        
+                        widget = record.payments_widget
+                        
+                        p_ids = []
+                        for p in record.payment_move_line_ids:
+                            p_ids.append(p.id)
+                        
+                        record.action_invoice_cancel()
+                        
+                        record.action_invoice_draft()
+                        
+                        record['state'] = 'draft'
+                        
+                        env.cr.commit()
+                        
+                        env['account.invoice.line'].create({
                             'name': 'Discount of $' + str(amount),
                             'quantity': 1,
                             'price_unit': -1 * amount,
-                            'invoice_id': invoice.id,
+                            'invoice_id': record.id,
                             'account_id': 17,
                             'product_id': 654,
                         })
-                        # invoice['residual'] = invoice.residual - amount
                         
-                        self.env.cr.commit()
-                        validate = self.env['ir.actions.server'].search([('id', '=', 754)])
-                        validate.run()
-
-                        # invoice.action_invoice_open
-                        # invoice.post()
-                        # invoice['payment_ids'] = payments
-                        # self.env.cr.commit()
+                        env.cr.commit()
+                        
+                        record.action_invoice_open()
+                        
+                        record['payment_move_line_ids'] = [(6, 0, p_ids)]
+                        record['payments_widget'] = widget
+                        record['payment_ids'] = [(6, 0, payments)]
+                        move_line = False
+                        
+                        for m in record.move_id.line_ids:
+                            if m.account_id.id == 7:
+                            move_line = m
+                        
+                        log(str(move_line), level="debug")  
+                        
+                        for p in record.payment_move_line_ids:
+                            p['invoice_id'] = record.id
+                            
+                            rec = env['account.partial.reconcile'].create({
+                            'debit_move_id': p.id,
+                            'credit_move_id': move_line.id
+                            })
+                            env.cr.commit()
+                            
+                            p['matched_debit_ids'] = [(4, rec.id)]
+                            p['reconciled'] = True
+                            
+                            env.cr.commit()
+                            move_line['matched_credit_ids'] = [(4, rec.id)]
+                            
+                            
+                        
+                        env.cr.commit()
 
                     amt += line.allocation
                     if line.allocation <= 0:
