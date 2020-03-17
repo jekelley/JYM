@@ -109,11 +109,6 @@ class account_payment(models.Model):
             if rec.invoice_lines:
                  
                 for line in rec.invoice_lines:
-                    amt += line.allocation
-                    if line.allocation <= 0:
-                        rec['invoice_ids'] = [(3, line.invoice_id.id)]
-                        line.unlink()
-                    # Add a discount line to every invoice with a discount
                     if line.discount > 0:
                         amount = line.discount
   
@@ -144,6 +139,13 @@ class account_payment(models.Model):
                         # invoice.post()
                         # invoice['payment_ids'] = payments
                         # self.env.cr.commit()
+
+                    amt += line.allocation
+                    if line.allocation <= 0:
+                        rec['invoice_ids'] = [(3, line.invoice_id.id)]
+                        line.unlink()
+                    # Add a discount line to every invoice with a discount
+                    
                 
                 if round(rec.amount, 2) < round(amt, 2):
                     raise ValidationError(("Total allocated amount and Payment amount are not equal. Payment amount is equal to " + str(rec.amount) + " and Total allocated amount is equal to %s") %(amt))
