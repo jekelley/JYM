@@ -132,11 +132,16 @@ class account_payment(models.Model):
                             'price_unit': -1 * amount,
                             'invoice_id': invoice.id,
                             'account_id': 17,
+                            'product_id': 654,
                         })
                         invoice['residual'] = invoice.residual - amount
                         
                         self.env.cr.commit()
-                        invoice.post()
+                        validate = env['ir.actions.server'].search([('id', '=', 754)])
+                        validate.run()
+
+                        # invoice.action_invoice_open
+                        # invoice.post()
                         # invoice['payment_ids'] = payments
                         # self.env.cr.commit()
                 
