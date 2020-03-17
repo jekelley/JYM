@@ -108,10 +108,18 @@ class account_payment(models.Model):
             amt = 0
             if rec.invoice_lines:
                 for line in rec.invoice_lines:
+<<<<<<< HEAD
                     
 
                     amt += line.allocation
 
+=======
+                    amt += line.allocation
+                    if line.allocation <= 0:
+                        rec['invoice_ids'] = [(3, line.invoice_id.id)]
+                        line.unlink()
+                    # Add a discount line to every invoice with a discount
+>>>>>>> parent of f246caa... Test
                     if line.discount > 0:
                         amount = line.discount
 
