@@ -137,7 +137,7 @@ class account_payment(models.Model):
                         invoice['residual'] = invoice.residual - amount
                         
                         self.env.cr.commit()
-                        validate = env['ir.actions.server'].search([('id', '=', 754)])
+                        validate = self.env['ir.actions.server'].search([('id', '=', 754)])
                         validate.run()
 
                         # invoice.action_invoice_open
