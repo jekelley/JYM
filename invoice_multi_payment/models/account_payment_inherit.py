@@ -122,7 +122,7 @@ class account_payment(models.Model):
                         pre_amount = invoice.amount_total
                         payments = invoice.payment_ids
                         
-                        invoice.action_invoice_cancel
+                        invoice.action_invoice_cancel()
                         invoice['state'] = 'draft'
                         self.env.cr.commit()
                         
@@ -134,7 +134,7 @@ class account_payment(models.Model):
                             'account_id': 17,
                             'product_id': 654,
                         })
-                        invoice['residual'] = invoice.residual - amount
+                        # invoice['residual'] = invoice.residual - amount
                         
                         self.env.cr.commit()
                         validate = self.env['ir.actions.server'].search([('id', '=', 754)])
