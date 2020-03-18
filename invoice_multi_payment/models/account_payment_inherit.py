@@ -158,7 +158,7 @@ class account_payment(models.Model):
                             self.env.cr.commit()
                             
                             p['matched_debit_ids'] = [(4, reconcile.id)]
-                            p['reconciled'] = True
+                            recorde.register_payment(p)
 
                             move_line['matched_credit_ids'] = [(4, reconcile.id)]
                         self.env.cr.commit()
