@@ -111,8 +111,20 @@ class account_payment(models.Model):
                     amt += line.allocation
                     # ---
                     if line.discount > 0:
-                        add_discount_line = self.env['ir.actions.server'].search([('id', '=', 749)])
-                        add_discount_line.run()
+                        amount = line.discount
+                        recorde = line.invoice_id
+                        pre_amount = recorde.amount_total
+                        payments = []
+                        for p in recorde.payment_ids:
+                            payments.append(p.id)
+                        widget = recorde.payments_widget
+                        p_ids = []
+                        for p in recorde.payment_move_line_ids:
+                            p_ids.append(p.id)
+                        recorde.action_invoice_cancel()
+                        recorde.action_invoice_draft()
+                        
+                        recorde['state'] = 'draft'
 
                     # ---
                     if line.allocation <= 0:
