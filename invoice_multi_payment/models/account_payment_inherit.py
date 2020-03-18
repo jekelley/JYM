@@ -144,6 +144,25 @@ class account_payment(models.Model):
                         recorde['payment_ids'] = [(6, 0, payments)]
                         move_line = False
 
+                        for m in recorde.move_id.line_ids:
+                            if m.account_id.id == 7:
+                                move_line = m
+                        
+                        for p in recorde.payment_move_line_ids:
+                            p['invoice_id'] = recorde.id
+                            
+                            rec = self.env['account.partial.reconcile'].create({
+                            'debit_move_id': p.id,
+                            'credit_move_id': move_line.id
+                            })
+                            self.env.cr.commit()
+                            
+                            p['matched_debit_ids'] = [(4, rec.id)]
+                            p['reconciled'] = True
+                            
+                            move_line['matched_credit_ids'] = [(4, rec.id)]
+                        self.env.cr.commit()
+
                     # ---
                     if line.allocation <= 0:
                         rec['invoice_ids'] = [(3, line.invoice_id.id)]
