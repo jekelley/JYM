@@ -132,28 +132,19 @@ class account_payment(models.Model):
 
     def create_discount_line(self, line):
         amount = line.discount
-
-        # amount = 100
-
-        record = line.invoice_id
-        
-        pre_amount = record.amount_total
-        
+        recorde = line.invoice_id
+        pre_amount = recorde.amount_total
         payments = []
-        for p in record.payment_ids:
+        for p in recorde.payment_ids:
             payments.append(p.id)
-        
-        widget = record.payments_widget
-        
+        widget = recorde.payments_widget
         p_ids = []
-        for p in record.payment_move_line_ids:
+        for p in recorde.payment_move_line_ids:
             p_ids.append(p.id)
+        recorde.action_invoice_cancel()
+        recorde.action_invoice_draft()
         
-        record.action_invoice_cancel()
-        
-        record.action_invoice_draft()
-        
-        record['state'] = 'draft'
+        recorde['state'] = 'draft'
         
         # env.cr.commit()
         
@@ -161,28 +152,28 @@ class account_payment(models.Model):
             'name': 'Discount of $' + str(amount),
             'quantity': 1,
             'price_unit': -1 * amount,
-            'invoice_id': record.id,
+            'invoice_id': recorde.id,
             'account_id': 17,
             'product_id': 654,
         })
         
         self.env.cr.commit()
         
-        record.action_invoice_open()
+        recorde.action_invoice_open()
         
-        record['payment_move_line_ids'] = [(6, 0, p_ids)]
-        record['payments_widget'] = widget
-        record['payment_ids'] = [(6, 0, payments)]
+        recorde['payment_move_line_ids'] = [(6, 0, p_ids)]
+        recorde['payments_widget'] = widget
+        recorde['payment_ids'] = [(6, 0, payments)]
         move_line = False
         
-        for m in record.move_id.line_ids:
+        for m in recorde.move_id.line_ids:
             if m.account_id.id == 7:
             move_line = m
         
         # log(str(move_line), level="debug")  
         
-        for p in record.payment_move_line_ids:
-            p['invoice_id'] = record.id
+        for p in recorde.payment_move_line_ids:
+            p['invoice_id'] = recorde.id
             
             rec = self.env['account.partial.reconcile'].create({
             'debit_move_id': p.id,
