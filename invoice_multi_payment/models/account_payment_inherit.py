@@ -111,7 +111,9 @@ class account_payment(models.Model):
                     amt += line.allocation
                     # ---
                     if line.discount > 0:
-                        t = True
+                        add_discount_line = self.env['ir.actions.server'].search([('id', '=', 749)])
+                        add_discount_line.run()
+
                     # ---
                     if line.allocation <= 0:
                         rec['invoice_ids'] = [(3, line.invoice_id.id)]
