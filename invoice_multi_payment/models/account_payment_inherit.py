@@ -110,7 +110,8 @@ class account_payment(models.Model):
                 for line in rec.invoice_lines:
                     amt += line.allocation
                     # ---
-                    # if line.discount > 0:
+                    if line.discount > 0:
+                        t = True
                     # ---
                     if line.allocation <= 0:
                         rec['invoice_ids'] = [(3, line.invoice_id.id)]
