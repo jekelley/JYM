@@ -113,70 +113,7 @@ class account_payment(models.Model):
                     amt += line.allocation
                     # ---
                     if line.discount > 0:
-                        amount = line.discount
-
-                        # amount = 100
-
-                        record = line.invoice_id
-                        
-                        pre_amount = record.amount_total
-                        
-                        payments = []
-                        for p in record.payment_ids:
-                            payments.append(p.id)
-                        
-                        widget = record.payments_widget
-                        
-                        p_ids = []
-                        for p in record.payment_move_line_ids:
-                            p_ids.append(p.id)
-                        
-                        record.action_invoice_cancel()
-                        
-                        record.action_invoice_draft()
-                        
-                        record['state'] = 'draft'
-                        
-                        # env.cr.commit()
-                        
-                        self.env['account.invoice.line'].create({
-                            'name': 'Discount of $' + str(amount),
-                            'quantity': 1,
-                            'price_unit': -1 * amount,
-                            'invoice_id': record.id,
-                            'account_id': 17,
-                            'product_id': 654,
-                        })
-                        
-                        self.env.cr.commit()
-                        
-                        record.action_invoice_open()
-                        
-                        record['payment_move_line_ids'] = [(6, 0, p_ids)]
-                        record['payments_widget'] = widget
-                        record['payment_ids'] = [(6, 0, payments)]
-                        move_line = False
-                        
-                        for m in record.move_id.line_ids:
-                            if m.account_id.id == 7:
-                            move_line = m
-                        
-                        # log(str(move_line), level="debug")  
-                        
-                        for p in record.payment_move_line_ids:
-                            p['invoice_id'] = record.id
-                            
-                            rec = self.env['account.partial.reconcile'].create({
-                            'debit_move_id': p.id,
-                            'credit_move_id': move_line.id
-                            })
-                            self.env.cr.commit()
-                            
-                            p['matched_debit_ids'] = [(4, rec.id)]
-                            p['reconciled'] = True
-                            # env.cr.commit()
-                            move_line['matched_credit_ids'] = [(4, rec.id)]
-                        self.env.cr.commit()
+                        create_discount_line(self, line)
                     # ---
 
                     
@@ -192,6 +129,72 @@ class account_payment(models.Model):
                     raise ValidationError(("Total allocated amount and Payment amount are not equal. Payment amount is equal to " + str(rec.amount) + " and Total allocated amount is equal to %s") %(amt))
         return  super(account_payment,self).post()
             
+
+    def create_discount_line(self, line):
+        amount = line.discount
+
+        # amount = 100
+
+        record = line.invoice_id
+        
+        pre_amount = record.amount_total
+        
+        payments = []
+        for p in record.payment_ids:
+            payments.append(p.id)
+        
+        widget = record.payments_widget
+        
+        p_ids = []
+        for p in record.payment_move_line_ids:
+            p_ids.append(p.id)
+        
+        record.action_invoice_cancel()
+        
+        record.action_invoice_draft()
+        
+        record['state'] = 'draft'
+        
+        # env.cr.commit()
+        
+        self.env['account.invoice.line'].create({
+            'name': 'Discount of $' + str(amount),
+            'quantity': 1,
+            'price_unit': -1 * amount,
+            'invoice_id': record.id,
+            'account_id': 17,
+            'product_id': 654,
+        })
+        
+        self.env.cr.commit()
+        
+        record.action_invoice_open()
+        
+        record['payment_move_line_ids'] = [(6, 0, p_ids)]
+        record['payments_widget'] = widget
+        record['payment_ids'] = [(6, 0, payments)]
+        move_line = False
+        
+        for m in record.move_id.line_ids:
+            if m.account_id.id == 7:
+            move_line = m
+        
+        # log(str(move_line), level="debug")  
+        
+        for p in record.payment_move_line_ids:
+            p['invoice_id'] = record.id
+            
+            rec = self.env['account.partial.reconcile'].create({
+            'debit_move_id': p.id,
+            'credit_move_id': move_line.id
+            })
+            self.env.cr.commit()
+            
+            p['matched_debit_ids'] = [(4, rec.id)]
+            p['reconciled'] = True
+            # env.cr.commit()
+            move_line['matched_credit_ids'] = [(4, rec.id)]
+        self.env.cr.commit()
 
     @api.multi
     def _create_payment_entry(self, amount):
