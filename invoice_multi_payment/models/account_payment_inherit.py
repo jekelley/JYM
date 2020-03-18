@@ -151,16 +151,16 @@ class account_payment(models.Model):
                         for p in recorde.payment_move_line_ids:
                             p['invoice_id'] = recorde.id
                             
-                            rec = self.env['account.partial.reconcile'].create({
+                            reconcile = self.env['account.partial.reconcile'].create({
                             'debit_move_id': p.id,
                             'credit_move_id': move_line.id
                             })
                             self.env.cr.commit()
                             
-                            p['matched_debit_ids'] = [(4, rec.id)]
+                            p['matched_debit_ids'] = [(4, reconcile.id)]
                             p['reconciled'] = True
-                            
-                            move_line['matched_credit_ids'] = [(4, rec.id)]
+
+                            move_line['matched_credit_ids'] = [(4, reconcile.id)]
                         self.env.cr.commit()
 
                     # ---
