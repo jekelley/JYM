@@ -131,7 +131,7 @@ class account_payment(models.Model):
                             'quantity': 1,
                             'price_unit': -1 * amount,
                             'invoice_id': recorde.id,
-                            'account_id': 17,
+                            'account_id': 306,
                             'product_id': 654,
                         })
                         
