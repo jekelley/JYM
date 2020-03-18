@@ -108,15 +108,10 @@ class account_payment(models.Model):
             amt = 0
             if rec.invoice_lines:
                 for line in rec.invoice_lines:
-                    
-
                     amt += line.allocation
                     # ---
-                    if line.discount > 0:
-                        create_discount_line(self, line)
+                    # if line.discount > 0:
                     # ---
-
-                    
                     if line.allocation <= 0:
                         rec['invoice_ids'] = [(3, line.invoice_id.id)]
                         line.unlink()
@@ -128,10 +123,6 @@ class account_payment(models.Model):
                 if round(rec.amount, 2) > round(amt, 2):
                     raise ValidationError(("Total allocated amount and Payment amount are not equal. Payment amount is equal to " + str(rec.amount) + " and Total allocated amount is equal to %s") %(amt))
         return  super(account_payment,self).post()
-            
-
-    def create_discount_line(self, line):
-        
 
     @api.multi
     def _create_payment_entry(self, amount):
