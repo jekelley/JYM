@@ -126,6 +126,24 @@ class account_payment(models.Model):
                         
                         recorde['state'] = 'draft'
 
+                        self.env['account.invoice.line'].create({
+                            'name': 'Discount of $' + str(amount),
+                            'quantity': 1,
+                            'price_unit': -1 * amount,
+                            'invoice_id': recorde.id,
+                            'account_id': 17,
+                            'product_id': 654,
+                        })
+                        
+                        self.env.cr.commit()
+                        
+                        recorde.action_invoice_open()
+                        
+                        recorde['payment_move_line_ids'] = [(6, 0, p_ids)]
+                        recorde['payments_widget'] = widget
+                        recorde['payment_ids'] = [(6, 0, payments)]
+                        move_line = False
+
                     # ---
                     if line.allocation <= 0:
                         rec['invoice_ids'] = [(3, line.invoice_id.id)]
