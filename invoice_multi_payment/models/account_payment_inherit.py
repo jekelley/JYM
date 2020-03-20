@@ -367,8 +367,100 @@ class CreditNoteInvoiceLine(models.Model):
             data.total_amount = invoice_id.amount_total 
             data.open_amount = invoice_id.residual
 
-# class account_invoice(models.Model):
-#      _inherit = 'account.invoice'
+class account_invoice(models.Model):
+     _inherit = 'account.invoice'
 
-#      credit_note_lines = fields.One2many('invoice.creditnote.line', 'invoice_id', string="Credit Note Lines")
-#      invoice_lines = fields.One2many('creditnote.invoice.line', 'credit_note_id', string="Invoice Lines")
+     credit_note_lines = fields.One2many('invoice.creditnote.line', 'invoice_id', string="Credit Note Lines")
+     invoice_lines = fields.One2many('creditnote.invoice.line', 'credit_note_id', string="Invoice Lines")
+
+
+    @api.multi
+    def update_invoice_lines(self):
+        for inv in self.invoice_lines:
+            inv.open_amount = inv.invoice_id.residual 
+        self.onchange_partner_id()
+        
+    # @api.onchange('partner_type')
+    # def _onchange_partner_type(self):
+    #     # Set partner_id domain
+    #     if self.partner_type:
+    #         if not self.env.context.get('default_invoice_ids'):
+    #             self.partner_id = False
+    #         return {'domain': {'partner_id': [(self.partner_type, '=', True)]}}
+
+    @api.onchange('partner_id', 'currency_id')
+    def onchange_partner_id(self):
+        if self.partner_id:
+            vals = {}
+            invoice_lines = [(6, 0, [])]
+            credit_note_lines = [(6, 0, [])]
+            invoice_ids = []
+            credit_note_ids = []
+            if self.type == 'out_invoice':
+                credit_note_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),
+                                                                  ('state', '=','open'),
+                                                                  ('type','=', 'out_refund'),
+                                                                  ('currency_id', '=', self.currency_id.id)])
+            if self.type == 'out_refund':
+                invoice_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),
+                                                                  ('state', '=','open'),
+                                                                  ('type','=', 'out_invoice'),
+                                                                  ('currency_id', '=', self.currency_id.id)])
+            # IMPLEMENT FOR VENDOR BILLS
+            # if self.payment_type == 'inbound' and self.partner_type == 'customer':
+            #     invoice_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),
+            #                                                       ('state', '=','open'),
+            #                                                       ('type','=', 'out_invoice'),
+            #                                                       ('currency_id', '=', self.currency_id.id)])
+            # if self.payment_type == 'outbound' and self.partner_type == 'customer':
+            #     invoice_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),
+            #                                                       ('state', '=','open'),
+            #                                                       ('type','=', 'out_refund'),
+            #                                                       ('currency_id', '=', self.currency_id.id)])
+
+            for inv in credit_note_ids[::-1]:
+                vals = {
+                       'invoice_id': inv.id,
+                       }
+                credit_note_lines.append((0, 0, vals))
+            for inv in invoice_ids[::-1]:
+                vals = {
+                       'credit_note_id': inv.id,
+                       }
+                invoice_lines.append((0, 0, vals))
+
+            self.invoice_lines = invoice_lines
+            self.credit_note_lines = credit_note_lines
+            # self.onchnage_amount() 
+        
+    # @api.onchange('payment_type')
+    # def _onchange_payment_type(self):
+    #     if self.payment_type == 'transfer':
+    #         self.invoice_lines = [(6, 0, [])]
+            
+    #     if not self.invoice_ids:
+    #         # Set default partner type for the payment type
+    #         if self.payment_type == 'inbound':
+    #             self.partner_type = 'customer'
+    #         elif self.payment_type == 'outbound':
+    #             self.partner_type = 'supplier'
+    #     # Set payment method domain
+    #     res = self._onchange_journal()
+    #     if not res.get('domain', {}):
+    #         res['domain'] = {}
+    #     res['domain']['journal_id'] = self.payment_type == 'inbound' and [('at_least_one_inbound', '=', True)] or [('at_least_one_outbound', '=', True)]
+    #     res['domain']['journal_id'].append(('type', 'in', ('bank', 'cash')))
+    #     return res
+    
+    # @api.onchange('amount')
+    # def onchnage_amount(self):
+    #     total = 0.0
+    #     remain = self.amount
+    #     for line in self.invoice_lines:
+    #         if line.open_amount <= remain:
+    #             line.allocation = line.open_amount
+    #             remain -= line.allocation
+    #         else:
+    #             line.allocation = remain
+    #             remain -= line.allocation
+    #         total += line.allocation
