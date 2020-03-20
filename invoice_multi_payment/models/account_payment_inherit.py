@@ -1,7 +1,6 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
-
 class account_payment(models.Model):
     _inherit = 'account.payment'
     
@@ -321,3 +320,35 @@ class PaymentInvoiceLine(models.Model):
             data.due_date = invoice_id.date_due
             data.total_amount = invoice_id.amount_total 
             data.open_amount = invoice_id.residual
+
+class InvoiceCreditNoteLine(models.Model):
+    _name = 'invoice.creditnote.line'
+
+    invoice_id = fields.Many2one('account.invoice', string="Invoice")
+    credit_note_id = fields.Many2one('account.invoice', string="Credit Note")
+    credit_note = fields.Char(related='credit_note_id.number', string="Credit Note Number")
+    account_id = fields.Many2one(related="credit_note_id.account_id", string="Account")
+    date = fields.Date(string='Credit Note Date', related='credit_note_id.date_invoice')
+    due_date = fields.Date(string='Due Date', related='credit_note_id.date_due')
+    total_amount = fields.Float(string='Total Amount', related='credit_note_id.amount_total', store=True)
+    open_amount = fields.Float(string='Due Amount', related='credit_note_id.residual', store=True)
+    allocation = fields.Float(string='Allocation Amount')
+
+class CreditNoteInvoiceLine(models.Model):
+    _name = 'creditnote.invoice.line'
+
+    credit_note_id = fields.Many2one('account.invoice', string="Credit Note")
+    invoice_id = fields.Many2one('account.invoice', string="Invoice")
+    invoice = fields.Char(related='invoice_id.number', string="Credit Note Number")
+    account_id = fields.Many2one(related="invoice_id.account_id", string="Account")
+    date = fields.Date(string='Credit Note Date', related='invoice_id.date_invoice')
+    due_date = fields.Date(string='Due Date', related='invoice_id.date_due')
+    total_amount = fields.Float(string='Total Amount', related='invoice_id.amount_total', store=True)
+    open_amount = fields.Float(string='Due Amount', related='invoice_id.residual', store=True)
+    allocation = fields.Float(string='Allocation Amount')
+
+# class account_invoice(models.Model):
+#      _inherit = 'account.invoice'
+
+#      credit_note_lines = fields.One2many('invoice.creditnote.line', 'invoice_id', string="Credit Note Lines")
+#      invoice_lines = fields.One2many('creditnote.invoice.line', 'credit_note_id', string="Invoice Lines")
