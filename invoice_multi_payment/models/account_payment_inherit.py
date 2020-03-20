@@ -423,7 +423,7 @@ class account_invoice(models.Model):
 
             self.invoice_lines = invoice_lines
             self.credit_note_lines = credit_note_lines
-            self.onchnage_amount() 
+            # self.onchnage_amount()
         
     # @api.onchange('payment_type')
     # def _onchange_payment_type(self):
