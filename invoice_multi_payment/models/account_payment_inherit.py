@@ -368,11 +368,10 @@ class CreditNoteInvoiceLine(models.Model):
             data.open_amount = invoice_id.residual
 
 class account_invoice(models.Model):
-     _inherit = 'account.invoice'
+    _inherit = 'account.invoice'
 
-     credit_note_lines = fields.One2many('invoice.creditnote.line', 'invoice_id', string="Credit Note Lines")
-     invoice_lines = fields.One2many('creditnote.invoice.line', 'credit_note_id', string="Invoice Lines")
-
+    credit_note_lines = fields.One2many('invoice.creditnote.line', 'invoice_id', string="Credit Note Lines")
+    invoice_lines = fields.One2many('creditnote.invoice.line', 'credit_note_id', string="Invoice Lines")
 
     @api.multi
     def update_invoice_and_credit_note_lines(self):
@@ -380,7 +379,7 @@ class account_invoice(models.Model):
             inv.open_amount = inv.invoice_id.residual
         for inv in self.invoice_lines:
             inv.open_amount = inv.credit_note_id.residual 
-        # self.onchange_partner_id()
+        self.onchange_partner_id()
         
     # @api.onchange('partner_type')
     # def _onchange_partner_type(self):
@@ -390,18 +389,18 @@ class account_invoice(models.Model):
     #             self.partner_id = False
     #         return {'domain': {'partner_id': [(self.partner_type, '=', True)]}}
 
-    # @api.onchange('partner_id', 'currency_id')
-    # def onchange_partner_id(self):
-    #     if self.partner_id:
-    #         vals = {}
-    #         invoice_lines = [(6, 0, [])]
-    #         credit_note_lines = [(6, 0, [])]
-    #         invoice_ids = []
-    #         credit_note_ids = []
-    #         if self.type == 'out_invoice':
-    #             credit_note_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),('state', '=','open'),('type','=', 'out_refund'),('currency_id', '=', self.currency_id.id)])
-    #         if self.type == 'out_refund':
-    #             invoice_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),('state', '=','open'),('type','=', 'out_invoice'),('currency_id', '=', self.currency_id.id)])
+    @api.onchange('partner_id', 'currency_id')
+    def onchange_partner_id(self):
+        if self.partner_id:
+            vals = {}
+            invoice_lines = [(6, 0, [])]
+            credit_note_lines = [(6, 0, [])]
+            invoice_ids = []
+            credit_note_ids = []
+            if self.type == 'out_invoice':
+                credit_note_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),('state', '=','open'),('type','=', 'out_refund'),('currency_id', '=', self.currency_id.id)])
+            if self.type == 'out_refund':
+                invoice_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),('state', '=','open'),('type','=', 'out_invoice'),('currency_id', '=', self.currency_id.id)])
             # IMPLEMENT FOR VENDOR BILLS
             # if self.payment_type == 'inbound' and self.partner_type == 'customer':
             #     invoice_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),
@@ -414,21 +413,17 @@ class account_invoice(models.Model):
             #                                                       ('type','=', 'out_refund'),
             #                                                       ('currency_id', '=', self.currency_id.id)])
 
-            # for inv in credit_note_ids[::-1]:
-            #     vals = {
-            #            'invoice_id': inv.id,
-            #            }
-            #     credit_note_lines.append((0, 0, vals))
+            for inv in credit_note_ids[::-1]:
+                vals = {'invoice_id': inv.id,}
+                credit_note_lines.append((0, 0, vals))
 
-            # for inv in invoice_ids[::-1]:
-            #     vals = {
-            #            'credit_note_id': inv.id,
-            #            }
-            #     invoice_lines.append((0, 0, vals))
+            for inv in invoice_ids[::-1]:
+                vals = {'credit_note_id': inv.id,}
+                invoice_lines.append((0, 0, vals))
 
-            # self.invoice_lines = invoice_lines
-            # self.credit_note_lines = credit_note_lines
-            # self.onchnage_amount() 
+            self.invoice_lines = invoice_lines
+            self.credit_note_lines = credit_note_lines
+            self.onchnage_amount() 
         
     # @api.onchange('payment_type')
     # def _onchange_payment_type(self):
