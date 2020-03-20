@@ -374,11 +374,11 @@ class account_invoice(models.Model):
      invoice_lines = fields.One2many('creditnote.invoice.line', 'credit_note_id', string="Invoice Lines")
 
 
-    # @api.multi
-    # def update_invoice_lines(self):
-    #     for inv in self.invoice_lines:
-    #         inv.open_amount = inv.invoice_id.residual 
-    #     self.onchange_partner_id()
+    @api.multi
+    def update_invoice_lines(self):
+        for inv in self.invoice_lines:
+            inv.open_amount = inv.invoice_id.residual 
+        self.onchange_partner_id()
         
     # @api.onchange('partner_type')
     # def _onchange_partner_type(self):
@@ -388,24 +388,18 @@ class account_invoice(models.Model):
     #             self.partner_id = False
     #         return {'domain': {'partner_id': [(self.partner_type, '=', True)]}}
 
-    # @api.onchange('partner_id', 'currency_id')
-    # def onchange_partner_id(self):
-    #     if self.partner_id:
-    #         vals = {}
-    #         invoice_lines = [(6, 0, [])]
-    #         credit_note_lines = [(6, 0, [])]
-    #         invoice_ids = []
-    #         credit_note_ids = []
-    #         if self.type == 'out_invoice':
-    #             credit_note_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),
-    #                                                               ('state', '=','open'),
-    #                                                               ('type','=', 'out_refund'),
-    #                                                               ('currency_id', '=', self.currency_id.id)])
-    #         if self.type == 'out_refund':
-    #             invoice_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),
-    #                                                               ('state', '=','open'),
-    #                                                               ('type','=', 'out_invoice'),
-    #                                                               ('currency_id', '=', self.currency_id.id)])
+    @api.onchange('partner_id', 'currency_id')
+    def onchange_partner_id(self):
+        if self.partner_id:
+            vals = {}
+            invoice_lines = [(6, 0, [])]
+            credit_note_lines = [(6, 0, [])]
+            invoice_ids = []
+            credit_note_ids = []
+            if self.type == 'out_invoice':
+                credit_note_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),('state', '=','open'),('type','=', 'out_refund'),('currency_id', '=', self.currency_id.id)])
+            if self.type == 'out_refund':
+                invoice_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),('state', '=','open'),('type','=', 'out_invoice'),('currency_id', '=', self.currency_id.id)])
             # IMPLEMENT FOR VENDOR BILLS
             # if self.payment_type == 'inbound' and self.partner_type == 'customer':
             #     invoice_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),
