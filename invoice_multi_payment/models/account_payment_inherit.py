@@ -414,11 +414,11 @@ class account_invoice(models.Model):
             #                                                       ('currency_id', '=', self.currency_id.id)])
 
             for inv in credit_note_ids[::-1]:
-                vals = {'invoice_id': inv.id,}
+                vals = {'invoice_id': self.id, 'credit_note_id': inv.id}
                 credit_note_lines.append((0, 0, vals))
 
             for inv in invoice_ids[::-1]:
-                vals = {'credit_note_id': inv.id,}
+                vals = {'credit_note_id': self.id, 'invoice_id': inv.id}
                 invoice_lines.append((0, 0, vals))
 
             self.invoice_lines = invoice_lines
