@@ -388,24 +388,24 @@ class account_invoice(models.Model):
     #             self.partner_id = False
     #         return {'domain': {'partner_id': [(self.partner_type, '=', True)]}}
 
-    @api.onchange('partner_id', 'currency_id')
-    def onchange_partner_id(self):
-        if self.partner_id:
-            vals = {}
-            invoice_lines = [(6, 0, [])]
-            credit_note_lines = [(6, 0, [])]
-            invoice_ids = []
-            credit_note_ids = []
-            if self.type == 'out_invoice':
-                credit_note_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),
-                                                                  ('state', '=','open'),
-                                                                  ('type','=', 'out_refund'),
-                                                                  ('currency_id', '=', self.currency_id.id)])
-            if self.type == 'out_refund':
-                invoice_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),
-                                                                  ('state', '=','open'),
-                                                                  ('type','=', 'out_invoice'),
-                                                                  ('currency_id', '=', self.currency_id.id)])
+    # @api.onchange('partner_id', 'currency_id')
+    # def onchange_partner_id(self):
+    #     if self.partner_id:
+    #         vals = {}
+    #         invoice_lines = [(6, 0, [])]
+    #         credit_note_lines = [(6, 0, [])]
+    #         invoice_ids = []
+    #         credit_note_ids = []
+    #         if self.type == 'out_invoice':
+    #             credit_note_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),
+    #                                                               ('state', '=','open'),
+    #                                                               ('type','=', 'out_refund'),
+    #                                                               ('currency_id', '=', self.currency_id.id)])
+    #         if self.type == 'out_refund':
+    #             invoice_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),
+    #                                                               ('state', '=','open'),
+    #                                                               ('type','=', 'out_invoice'),
+    #                                                               ('currency_id', '=', self.currency_id.id)])
             # IMPLEMENT FOR VENDOR BILLS
             # if self.payment_type == 'inbound' and self.partner_type == 'customer':
             #     invoice_ids = self.env['account.invoice'].search([('partner_id', 'in', [self.partner_id.id]),
@@ -418,19 +418,20 @@ class account_invoice(models.Model):
             #                                                       ('type','=', 'out_refund'),
             #                                                       ('currency_id', '=', self.currency_id.id)])
 
-            for inv in credit_note_ids[::-1]:
-                vals = {
-                       'invoice_id': inv.id,
-                       }
-                credit_note_lines.append((0, 0, vals))
-            for inv in invoice_ids[::-1]:
-                vals = {
-                       'credit_note_id': inv.id,
-                       }
-                invoice_lines.append((0, 0, vals))
+            # for inv in credit_note_ids[::-1]:
+            #     vals = {
+            #            'invoice_id': inv.id,
+            #            }
+            #     credit_note_lines.append((0, 0, vals))
 
-            self.invoice_lines = invoice_lines
-            self.credit_note_lines = credit_note_lines
+            # for inv in invoice_ids[::-1]:
+            #     vals = {
+            #            'credit_note_id': inv.id,
+            #            }
+            #     invoice_lines.append((0, 0, vals))
+
+            # self.invoice_lines = invoice_lines
+            # self.credit_note_lines = credit_note_lines
             # self.onchnage_amount() 
         
     # @api.onchange('payment_type')
