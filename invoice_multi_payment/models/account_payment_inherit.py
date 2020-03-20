@@ -328,11 +328,21 @@ class InvoiceCreditNoteLine(models.Model):
     credit_note_id = fields.Many2one('account.invoice', string="Credit Note")
     credit_note = fields.Char(related='credit_note_id.number', string="Credit Note Number")
     account_id = fields.Many2one(related="credit_note_id.account_id", string="Account")
-    date = fields.Date(string='Credit Note Date', related='credit_note_id.date_invoice')
-    due_date = fields.Date(string='Due Date', related='credit_note_id.date_due')
-    total_amount = fields.Float(string='Total Amount', related='credit_note_id.amount_total', store=True)
-    open_amount = fields.Float(string='Due Amount', related='credit_note_id.residual', store=True)
+    date = fields.Date(string='Credit Note Date', compute='_get_credit_note_data', store=True)
+    due_date = fields.Date(string='Due Date', compute='_get_credit_note_data', store=True)
+    total_amount = fields.Float(string='Total Amount', compute='_get_credit_note_data', store=True)
+    open_amount = fields.Float(string='Due Amount', compute='_get_credit_note_data', store=True)
     allocation = fields.Float(string='Allocation Amount')
+
+    @api.multi
+    @api.depends('credit_note_id')
+    def _get_credit_note_data(self):
+        for data in self:
+            credit_note_id = data.credit_note_id
+            data.date = credit_note_id.date_invoice
+            data.due_date = credit_note_id.date_due
+            data.total_amount = credit_note_id.amount_total 
+            data.open_amount = credit_note_id.residual
 
 class CreditNoteInvoiceLine(models.Model):
     _name = 'creditnote.invoice.line'
@@ -341,11 +351,21 @@ class CreditNoteInvoiceLine(models.Model):
     invoice_id = fields.Many2one('account.invoice', string="Invoice")
     invoice = fields.Char(related='invoice_id.number', string="Credit Note Number")
     account_id = fields.Many2one(related="invoice_id.account_id", string="Account")
-    date = fields.Date(string='Credit Note Date', related='invoice_id.date_invoice')
-    due_date = fields.Date(string='Due Date', related='invoice_id.date_due')
-    total_amount = fields.Float(string='Total Amount', related='invoice_id.amount_total', store=True)
-    open_amount = fields.Float(string='Due Amount', related='invoice_id.residual', store=True)
+    date = fields.Date(string='Credit Note Date', compute='_get_invoice_data', store=True)
+    due_date = fields.Date(string='Due Date', compute='_get_invoice_data', store=True)
+    total_amount = fields.Float(string='Total Amount', compute='_get_invoice_data', store=True)
+    open_amount = fields.Float(string='Due Amount', compute='_get_invoice_data', store=True)
     allocation = fields.Float(string='Allocation Amount')
+
+    @api.multi
+    @api.depends('invoice_id')
+    def _get_invoice_data(self):
+        for data in self:
+            invoice_id = data.invoice_id
+            data.date = invoice_id.date_invoice
+            data.due_date = invoice_id.date_due
+            data.total_amount = invoice_id.amount_total 
+            data.open_amount = invoice_id.residual
 
 # class account_invoice(models.Model):
 #      _inherit = 'account.invoice'
