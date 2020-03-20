@@ -374,11 +374,11 @@ class account_invoice(models.Model):
      invoice_lines = fields.One2many('creditnote.invoice.line', 'credit_note_id', string="Invoice Lines")
 
 
-    @api.multi
-    def update_invoice_lines(self):
-        for inv in self.invoice_lines:
-            inv.open_amount = inv.invoice_id.residual 
-        self.onchange_partner_id()
+    # @api.multi
+    # def update_invoice_lines(self):
+    #     for inv in self.invoice_lines:
+    #         inv.open_amount = inv.invoice_id.residual 
+    #     self.onchange_partner_id()
         
     # @api.onchange('partner_type')
     # def _onchange_partner_type(self):
