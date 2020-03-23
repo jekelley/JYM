@@ -511,9 +511,12 @@ class account_invoice(models.Model):
                             else:
                                 raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(str(round(amt, 2))))         
                         
+                        move = cn.credit_note_id.move_id
+                        move.button_cancel()
                         for line in cn.credit_note_id.move_id.line_ids:
                             if line.account_id.id == self.account_id.id and line.reconciled == False and line.credit == 0 and line.debit == 0:
                                 line.unlink()
+                        move.action_post()
         # if self.type == 'out_refund':
         self.update_invoice_and_credit_note_lines()  
 
