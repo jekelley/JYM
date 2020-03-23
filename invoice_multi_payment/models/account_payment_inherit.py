@@ -433,6 +433,8 @@ class account_invoice(models.Model):
                 if cn.allocation <= 0:
                     self['credit_note_lines'] = [(3, cn.id)]
                     cn.unlink()
+                if round(cn.allocation, 2) > round(cn.open_amount, 2):
+                    raise ValidationError(("Allocated amount for credit note" + cn.credit_note + " is higher than the due amount. Due amount is equal to " + str(round(cn.open_amount, 2)) + " and allocated amount is equal to %s") %(round(cn.allocation, 2)))
                 else:
                     amt += cn.allocation
             if round(amt, 2) > round(self.residual, 2):
@@ -442,8 +444,8 @@ class account_invoice(models.Model):
                     p_data = {'account_id': self.account_id.id, 'partner_id': self.partner_id.id, 'credit': cn.allocation, 'invoice_id': cn.credit_note_id.id, 'move_id': cn.credit_note_id.move_id.id}
                     payment_line = self.env['account.move.line'].create(p_data)
                     self.env.cr.commit()
-                    self['payment_move_line_ids'] = [(4, payment_line.id)]
-                    self.register_payment(payment_line)
+                    # self['payment_move_line_ids'] = [(4, payment_line.id)]
+                    # self.register_payment(payment_line)
         # if self.type == 'out_refund':
 
 
