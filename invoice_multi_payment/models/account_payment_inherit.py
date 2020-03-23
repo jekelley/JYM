@@ -444,29 +444,29 @@ class account_invoice(models.Model):
                 for cn in self.credit_note_lines:
                     if cn.allocation > 0:
                         p_data = {'account_id': self.account_id.id, 'partner_id': self.partner_id.id, 'credit': 0, 'invoice_id': cn.credit_note_id.id, 'move_id': cn.credit_note_id.move_id.id}
-                        move_line = False
-                        for line in cn.credit_note_id.move_id.line_ids:
-                            if line.account_id.id == self.account_id.id and line.credit > cn.allocation:
-                                move_line = line
-                                break
-                        if move_line:
-                            move = cn.credit_note_id.move_id
-                            move.button_cancel()
+                        # move_line = False
+                        # for line in cn.credit_note_id.move_id.line_ids:
+                        #     if line.account_id.id == self.account_id.id and line.credit > cn.allocation:
+                        #         move_line = line
+                        #         break
+                        # if move_line:
+                        #     move = cn.credit_note_id.move_id
+                        #     move.button_cancel()
 
-                            payment_line = self.env['account.move.line'].create(p_data)
-                            self.env.cr.commit()
+                        #     payment_line = self.env['account.move.line'].create(p_data)
+                        #     self.env.cr.commit()
 
                             
                             
-                            move_line.with_context(check_move_validity=False).write({'credit': move_line.credit - cn.allocation})
-                            payment_line.with_context(check_move_validity=False).write({'credit': cn.allocation})
+                        #     move_line.with_context(check_move_validity=False).write({'credit': move_line.credit - cn.allocation})
+                        #     payment_line.with_context(check_move_validity=False).write({'credit': cn.allocation})
 
-                            self.env.cr.commit()
+                        #     self.env.cr.commit()
 
-                            move.action_post()
+                        #     move.action_post()
 
-                            self['payment_move_line_ids'] = [(4, payment_line.id)]
-                            self.env.cr.commit()
+                        #     self['payment_move_line_ids'] = [(4, payment_line.id)]
+                        #     self.env.cr.commit()
                             
                             # for p in invoice.payment_move_line_ids:
                             #     if p.id == payment_line.id:
