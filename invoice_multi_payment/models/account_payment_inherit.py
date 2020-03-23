@@ -457,8 +457,10 @@ class account_invoice(models.Model):
                             self.env.cr.commit()
 
                             
-                            
-                            move_line.with_context(check_move_validity=False).write({'credit': move_line.credit - cn.allocation})
+                            if move_line.credit - cn.allocation == 0:
+                                move_line.with_context(check_move_validity=False).unlink()
+                            else:
+                                move_line.with_context(check_move_validity=False).write({'credit': move_line.credit - cn.allocation})
                             payment_line.with_context(check_move_validity=False).write({'credit': cn.allocation})
 
                             self.env.cr.commit()
@@ -495,7 +497,7 @@ class account_invoice(models.Model):
                                                 amt_left -= cred
                                             else:
                                                 cred = line.credit
-                                                line.with_context(check_move_validity=False).write({'credit': 0})
+                                                line.with_context(check_move_validity=False).unlink()
                                                 amt_left -= cred
                                 payment_line.with_context(check_move_validity=False).write({'credit': cn.allocation})
                                 self.env.cr.commit()
