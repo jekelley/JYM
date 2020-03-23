@@ -449,9 +449,14 @@ class account_invoice(models.Model):
                                 move_line = line
                                 break
                         if move_line:
+                            cn.credit_note_id.move_id.button_cancel()
+
                             move_line['credit'] = move_line.credit - cn.allocation
                             payment_line = self.env['account.move.line'].create(p_data)
                             self.env.cr.commit()
+
+                            cn.credit_note_id.move_id.action_post()
+
                             self['payment_move_line_ids'] = [(4, payment_line.id)]
                             self.register_payment(payment_line)
                         else:
