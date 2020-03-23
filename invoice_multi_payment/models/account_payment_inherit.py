@@ -475,7 +475,7 @@ class account_invoice(models.Model):
                         else:
                             raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(str(round(amt, 2))))         
         # if self.type == 'out_refund':
-        self.onchange_partner_id()  
+        self.update_invoice_and_credit_note_lines()  
 
 
 
