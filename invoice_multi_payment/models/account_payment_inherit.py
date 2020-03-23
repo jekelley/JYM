@@ -435,7 +435,7 @@ class account_invoice(models.Model):
                 #     self['credit_note_lines'] = [(3, cn.id)]
                 #     cn.unlink()
                 if round(cn.allocation, 2) > round(cn.open_amount, 2):
-                    raise ValidationError(("Allocated amount for credit note" + cn.credit_note + " is higher than the due amount. Due amount is equal to " + str(round(cn.open_amount, 2)) + " and allocated amount is equal to %s") %(round(cn.allocation, 2)))
+                    raise ValidationError(("Allocated amount for credit note " + str(cn.credit_note) + " is higher than the due amount. Due amount is equal to " + str(round(cn.open_amount, 2)) + " and allocated amount is equal to %s") %(round(cn.allocation, 2)))
                 else:
                     amt += cn.allocation
             if round(amt, 2) > round(self.residual, 2):
