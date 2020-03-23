@@ -428,7 +428,6 @@ class account_invoice(models.Model):
     @api.multi
     def register_payment(self):
         if self.type == 'out_invoice':
-            invoice = self
             amt = 0
             for cn in self.credit_note_lines:
                 # if cn.allocation <= 0:
@@ -444,44 +443,24 @@ class account_invoice(models.Model):
                 for cn in self.credit_note_lines:
                     if cn.allocation > 0:
                         p_data = {'account_id': self.account_id.id, 'partner_id': self.partner_id.id, 'credit': 0, 'invoice_id': cn.credit_note_id.id, 'move_id': cn.credit_note_id.move_id.id}
-                        # move_line = False
-                        # for line in cn.credit_note_id.move_id.line_ids:
-                        #     if line.account_id.id == self.account_id.id and line.credit > cn.allocation:
-                        #         move_line = line
-                        #         break
-                       
-                        cn.credit_note_id.move_id.button_cancel()
-
-                        payment_line = self.env['account.move.line'].create(p_data)
-                        self.env.cr.commit()
-
-                        entry_move_lines = []
-                        for line in cn.credit_note_id.move_id.line_ids:
-                            entry_move_lines.append(line)
-                        
                         move_line = False
-                        for line in entry_move_lines:
-                            if line.account_id.id == invoice.account_id.id and line.credit > cn.allocation:
+                        for line in cn.credit_note_id.move_id.line_ids:
+                            if line.account_id.id == self.account_id.id and line.credit > cn.allocation:
                                 move_line = line
                                 break
-                        
-                        p_line = False
-                        for line in entry_move_lines:
-                            if line.id == payment_line.id:
-                                p_line = line
-                                break
+                        if move_line:
+                            cn.credit_note_id.move_id.button_cancel()
 
-                        if move_line and p_line:
-                            move_line.credit = move_line.credit - cn.allocation
-                            p_line.credit = cn.allocation
-
-                            ids = []
-                            for line in entry_move_lines:
-                                ids.append(line.id)
-
-                            cn.credit_note_id.move_id.write({'line_ids': [(6,0,ids)]})
-                            
+                            payment_line = self.env['account.move.line'].create(p_data)
                             self.env.cr.commit()
+
+                            
+                            
+                            move_line.with_context(check_move_validity=False).write({'credit': move_line.credit - cn.allocation})
+                            payment_line.with_context(check_move_validity=False).write({'credit': cn.allocation})
+
+                            self.env.cr.commit()
+
                             cn.credit_note_id.move_id.action_post()
 
                             self['payment_move_line_ids'] = [(4, payment_line.id)]
