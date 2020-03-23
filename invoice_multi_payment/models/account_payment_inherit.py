@@ -443,7 +443,6 @@ class account_invoice(models.Model):
                 for cn in self.credit_note_lines:
                     if cn.allocation > 0:
                         p_data = {'account_id': self.account_id.id, 'partner_id': self.partner_id.id, 'credit': cn.allocation, 'invoice_id': cn.credit_note_id.id, 'move_id': cn.credit_note_id.move_id.id}
-                        payment_line = self.env['account.move.line'].create(p_data)
                         move_line = False
                         for lines in cn.credit_note_id.move_id.line_ids:
                             if line.credit > cn.allocation:
@@ -451,6 +450,7 @@ class account_invoice(models.Model):
                                 break
                         if move_line:
                             move_line['credit'] = move_line.credit - cn.allocation
+                            payment_line = self.env['account.move.line'].create(p_data)
                             self.env.cr.commit()
                             self['payment_move_line_ids'] = [(4, payment_line.id)]
                             self.register_payment(payment_line)
