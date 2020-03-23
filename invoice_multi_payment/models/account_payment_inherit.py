@@ -497,6 +497,7 @@ class account_invoice(models.Model):
                                                 cred = line.credit
                                                 line.with_context(check_move_validity=False).write({'credit': 0})
                                                 amt_left -= cred
+                                payment_line.with_context(check_move_validity=False).write({'credit': cn.allocation})
                                 self.env.cr.commit()
                                 move.action_post()
 
