@@ -450,7 +450,8 @@ class account_invoice(models.Model):
                                 move_line = line
                                 break
                         if move_line:
-                            cn.credit_note_id.move_id.button_cancel()
+                            move = cn.credit_note_id.move_id
+                            move.button_cancel()
 
                             payment_line = self.env['account.move.line'].create(p_data)
                             self.env.cr.commit()
@@ -462,7 +463,7 @@ class account_invoice(models.Model):
 
                             self.env.cr.commit()
 
-                            cn.credit_note_id.move_id.action_post()
+                            move.action_post()
 
                             self['payment_move_line_ids'] = [(4, payment_line.id)]
 
