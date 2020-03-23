@@ -439,7 +439,7 @@ class account_invoice(models.Model):
                 raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(round(amt, 2)))
             else:
                 for cn in self.credit_note_lines:
-                    p_data = {'account_id': self.account_id, 'partner_id': self.partner_id, 'credit': cn.allocation, 'invoice_id': cn.credit_note_id, 'move_id': cn.credit_note_id.move_id}
+                    p_data = {'account_id': self.account_id.id, 'partner_id': self.partner_id.id, 'credit': cn.allocation, 'invoice_id': cn.credit_note_id.id, 'move_id': cn.credit_note_id.move_id.id}
                     payment_line = self.env['account.move.line'].create(p_data)
                     self.env.cr.commit()
                     self['payment_move_line_ids'] = [(4, payment_line.id)]
