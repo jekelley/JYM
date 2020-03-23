@@ -349,9 +349,9 @@ class CreditNoteInvoiceLine(models.Model):
 
     credit_note_id = fields.Many2one('account.invoice', string="Credit Note")
     invoice_id = fields.Many2one('account.invoice', string="Invoice")
-    invoice = fields.Char(related='invoice_id.number', string="Credit Note Number")
+    invoice = fields.Char(related='invoice_id.number', string="Invoice Number")
     account_id = fields.Many2one(related="invoice_id.account_id", string="Account")
-    date = fields.Date(string='Credit Note Date', compute='_get_invoice_data', store=True)
+    date = fields.Date(string='Invoice Date', compute='_get_invoice_data', store=True)
     due_date = fields.Date(string='Due Date', compute='_get_invoice_data', store=True)
     total_amount = fields.Float(string='Total Amount', compute='_get_invoice_data', store=True)
     open_amount = fields.Float(string='Due Amount', compute='_get_invoice_data', store=True)
@@ -425,6 +425,29 @@ class account_invoice(models.Model):
             self.credit_note_lines = credit_note_lines
             # self.onchnage_amount()
         
+    @api.multi
+    def register_payment(self):
+        if self.type == 'out_invoice':
+            amt = 0
+            for cn in self.credit_note_lines:
+                if cn.allocation <= 0:
+                    self['credit_note_lines'] = [(3, cn.id)]
+                    cn.unlink()
+                else:
+                    amt += cn.allocation
+            if round(amt, 2) > round(self.residual, 2):
+                raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(round(amt, 2)))
+            else:
+                for cn in self.credit_note_lines:
+                    p_data = {'account_id': self.account_id, 'partner_id': self.partner_id, 'credit': cn.allocation, 'invoice_id': cn.credit_note_id, 'move_id': cn.credit_note_id.move_id}
+                    payment_line = self.env['account.move.line'].create(p_data)
+                    self.env.cr.commit()
+                    self['payment_move_line_ids'] = [(4, payment_line.id)]
+                    self.register_payment(payment_line)
+        if self.type == 'out_refund':
+
+
+
     # @api.onchange('payment_type')
     # def _onchange_payment_type(self):
     #     if self.payment_type == 'transfer':
