@@ -428,6 +428,7 @@ class account_invoice(models.Model):
     @api.multi
     def register_payment(self):
         if self.type == 'out_invoice':
+            invoice = self
             amt = 0
             for cn in self.credit_note_lines:
                 # if cn.allocation <= 0:
@@ -460,7 +461,7 @@ class account_invoice(models.Model):
                         
                         move_line = False
                         for line in entry_move_lines:
-                            if line.account_id.id == self.account_id.id and line.credit > cn.allocation:
+                            if line.account_id.id == invoice.account_id.id and line.credit > cn.allocation:
                                 move_line = line
                                 break
                         
