@@ -489,7 +489,7 @@ class account_invoice(models.Model):
                                         if amt_left <= 0:
                                             break
                                         else:
-                                            if amt_left >= line.credit:
+                                            if amt_left <= line.credit:
                                                 cred = line.credit
                                                 line.with_context(check_move_validity=False).write({'credit': cred - amt_left})
                                                 amt_left -= cred
