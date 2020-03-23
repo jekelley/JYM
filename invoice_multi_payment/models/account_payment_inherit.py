@@ -442,7 +442,7 @@ class account_invoice(models.Model):
             else:
                 for cn in self.credit_note_lines:
                     if cn.allocation > 0:
-                        p_data = {'account_id': self.account_id.id, 'partner_id': self.partner_id.id, 'credit': cn.allocation, 'invoice_id': cn.credit_note_id.id, 'move_id': cn.credit_note_id.move_id.id}
+                        p_data = {'account_id': self.account_id.id, 'partner_id': self.partner_id.id, 'credit': 0, 'invoice_id': cn.credit_note_id.id, 'move_id': cn.credit_note_id.move_id.id}
                         move_line = False
                         for line in cn.credit_note_id.move_id.line_ids:
                             if line.credit > cn.allocation:
@@ -451,8 +451,10 @@ class account_invoice(models.Model):
                         if move_line:
                             cn.credit_note_id.move_id.button_cancel()
 
-                            move_line['credit'] = move_line.credit - cn.allocation
                             payment_line = self.env['account.move.line'].create(p_data)
+                            
+                            move_line['credit'] = move_line.credit - cn.allocation
+                            payment_line['credit'] = cn.allocation
                             self.env.cr.commit()
 
                             cn.credit_note_id.move_id.action_post()
