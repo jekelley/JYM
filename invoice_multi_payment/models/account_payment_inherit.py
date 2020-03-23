@@ -428,6 +428,7 @@ class account_invoice(models.Model):
     @api.multi
     def register_payment(self):
         if self.type == 'out_invoice':
+            invoice = self
             amt = 0
             for cn in self.credit_note_lines:
                 # if cn.allocation <= 0:
@@ -465,9 +466,10 @@ class account_invoice(models.Model):
 
                             self['payment_move_line_ids'] = [(4, payment_line.id)]
 
-                            p = self.env['account.move.line'].search([('id','=',payment_line.id)])[0]
-
-                            self.register_payment(p)
+                            ps = self.env['account.move.line'].search([('id','=',payment_line.id)])
+                            for p in ps:
+                                invoice.register_payment(p)
+                            # self.register_payment(p)
                         else:
                             raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(round(amt, 2)))
             
