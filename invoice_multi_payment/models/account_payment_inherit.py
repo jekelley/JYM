@@ -468,21 +468,22 @@ class account_invoice(models.Model):
                             self['payment_move_line_ids'] = [(4, payment_line.id)]
                             self.env.cr.commit()
 
-                            mline = False
-                            for m in invoice.move_id.line_ids:
-                                if m.account_id.id == 7:
-                                    mline = m
+                            # mline = False
+                            # for m in invoice.move_id.line_ids:
+                            #     if m.account_id.id == 7:
+                            #         mline = m
                             
                             for p in invoice.payment_move_line_ids:
-                                p['invoice_id'] = invoice.id
+                                # p['invoice_id'] = invoice.id
                             
-                                reconcile = self.env['account.partial.reconcile'].create({'debit_move_id': p.id,'credit_move_id': mline.id})
-                                self.env.cr.commit()
+                                # reconcile = self.env['account.partial.reconcile'].create({'debit_move_id': p.id,'credit_move_id': mline.id})
+                                # self.env.cr.commit()
                             
-                                p['matched_debit_ids'] = [(4, reconcile.id)]
-                                invoice.register_payment(p)
+                                # p['matched_debit_ids'] = [(4, reconcile.id)]
+                                if p.id == payment_line.id:
+                                    invoice.register_payment(invoice, p)
 
-                                mline['matched_credit_ids'] = [(4, reconcile.id)]
+                                # mline['matched_credit_ids'] = [(4, reconcile.id)]
 
                             #     if p.id == payment_line.id:
                             #         invoice.register_payment(p)
