@@ -472,8 +472,8 @@ class account_invoice(models.Model):
                             #     if p.id == payment_line.id:
                             #         invoice.register_payment(p)
                             # self.env.cr.commit()
-                        else:
-                            raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(str(round(amt, 2))))         
+                        # else:
+                        #     raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(str(round(amt, 2))))         
         # if self.type == 'out_refund':
         # self.update_invoice_and_credit_note_lines()  
 
