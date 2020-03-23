@@ -470,14 +470,14 @@ class account_invoice(models.Model):
                                 p_line = line
                                 break
 
-                         if move_line and p_line:
+                        if move_line and p_line:
                             move_line.credit = move_line.credit - cn.allocation
                             p_line.credit = cn.allocation
 
                             ids = []
                             for line in entry_move_lines:
                                 ids.append(line.id)
-                                
+
                             cn.credit_note_id.move_id.write({'line_ids': [(6,0,ids)]})
                             
                             self.env.cr.commit()
