@@ -444,7 +444,7 @@ class account_invoice(models.Model):
                     if cn.allocation > 0:
                         p_data = {'account_id': self.account_id.id, 'partner_id': self.partner_id.id, 'credit': cn.allocation, 'invoice_id': cn.credit_note_id.id, 'move_id': cn.credit_note_id.move_id.id}
                         move_line = False
-                        for lines in cn.credit_note_id.move_id.line_ids:
+                        for line in cn.credit_note_id.move_id.line_ids:
                             if line.credit > cn.allocation:
                                 move_line = line
                                 break
