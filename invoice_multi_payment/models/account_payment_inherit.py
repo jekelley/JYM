@@ -426,7 +426,7 @@ class account_invoice(models.Model):
             # self.onchnage_amount()
         
     @api.multi
-    def register_payment(self):
+    def register_new_payment(self):
         if self.type == 'out_invoice':
             invoice = self
             amt = 0
@@ -467,31 +467,15 @@ class account_invoice(models.Model):
 
                             self['payment_move_line_ids'] = [(4, payment_line.id)]
                             self.env.cr.commit()
-
-                            # mline = False
-                            # for m in invoice.move_id.line_ids:
-                            #     if m.account_id.id == 7:
-                            #         mline = m
                             
                             for p in invoice.payment_move_line_ids:
-                                # p['invoice_id'] = invoice.id
-                            
-                                # reconcile = self.env['account.partial.reconcile'].create({'debit_move_id': p.id,'credit_move_id': mline.id})
-                                # self.env.cr.commit()
-                            
-                                # p['matched_debit_ids'] = [(4, reconcile.id)]
                                 if p.id == payment_line.id:
-                                    invoice.register_payment(invoice, p)
-
-                                # mline['matched_credit_ids'] = [(4, reconcile.id)]
-
-                            #     if p.id == payment_line.id:
-                            #         invoice.register_payment(p)
-                            # self.register_payment(p)
+                                    invoice.register_payment(p)
+                                    self.env.cr.commit()
                         else:
                             raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(round(amt, 2)))
             
-                        
+            self.onchange_partner_id()           
         # if self.type == 'out_refund':
 
 
