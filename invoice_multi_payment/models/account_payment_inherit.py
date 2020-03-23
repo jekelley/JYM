@@ -430,9 +430,9 @@ class account_invoice(models.Model):
         if self.type == 'out_invoice':
             amt = 0
             for cn in self.credit_note_lines:
-                if cn.allocation <= 0:
-                    self['credit_note_lines'] = [(3, cn.id)]
-                    cn.unlink()
+                # if cn.allocation <= 0:
+                #     self['credit_note_lines'] = [(3, cn.id)]
+                #     cn.unlink()
                 if round(cn.allocation, 2) > round(cn.open_amount, 2):
                     raise ValidationError(("Allocated amount for credit note" + cn.credit_note + " is higher than the due amount. Due amount is equal to " + str(round(cn.open_amount, 2)) + " and allocated amount is equal to %s") %(round(cn.allocation, 2)))
                 else:
@@ -441,11 +441,12 @@ class account_invoice(models.Model):
                 raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(round(amt, 2)))
             else:
                 for cn in self.credit_note_lines:
-                    p_data = {'account_id': self.account_id.id, 'partner_id': self.partner_id.id, 'credit': cn.allocation, 'invoice_id': cn.credit_note_id.id, 'move_id': cn.credit_note_id.move_id.id}
-                    payment_line = self.env['account.move.line'].create(p_data)
-                    self.env.cr.commit()
-                    # self['payment_move_line_ids'] = [(4, payment_line.id)]
-                    # self.register_payment(payment_line)
+                    if cn.allocation > 0:
+                        p_data = {'account_id': self.account_id.id, 'partner_id': self.partner_id.id, 'credit': cn.allocation, 'invoice_id': cn.credit_note_id.id, 'move_id': cn.credit_note_id.move_id.id}
+                        payment_line = self.env['account.move.line'].create(p_data)
+                        self.env.cr.commit()
+                        # self['payment_move_line_ids'] = [(4, payment_line.id)]
+                        # self.register_payment(payment_line)
         # if self.type == 'out_refund':
 
 
