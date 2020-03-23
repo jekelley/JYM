@@ -466,10 +466,11 @@ class account_invoice(models.Model):
                             move.action_post()
 
                             self['payment_move_line_ids'] = [(4, payment_line.id)]
-
-                            ps = self.env['account.move.line'].search([('id','=',payment_line.id)])
-                            for p in ps:
-                                invoice.register_payment(p)
+                            self.env.cr.commit()
+                            
+                            for p in invoice.payment_move_line_ids:
+                                if p.id == payment_line.id:
+                                    invoice.register_payment(p)
                             # self.register_payment(p)
                         else:
                             raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(round(amt, 2)))
