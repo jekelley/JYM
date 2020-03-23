@@ -457,10 +457,8 @@ class account_invoice(models.Model):
                             self.env.cr.commit()
 
                             
-                            if move_line.credit - cn.allocation == 0:
-                                move_line.with_context(check_move_validity=False).unlink()
-                            else:
-                                move_line.with_context(check_move_validity=False).write({'credit': move_line.credit - cn.allocation})
+                            
+                            move_line.with_context(check_move_validity=False).write({'credit': move_line.credit - cn.allocation})
                             payment_line.with_context(check_move_validity=False).write({'credit': cn.allocation})
 
                             self.env.cr.commit()
@@ -497,7 +495,7 @@ class account_invoice(models.Model):
                                                 amt_left -= cred
                                             else:
                                                 cred = line.credit
-                                                line.with_context(check_move_validity=False).unlink()
+                                                line.with_context(check_move_validity=False).write({'credit': 0})
                                                 amt_left -= cred
                                 payment_line.with_context(check_move_validity=False).write({'credit': cn.allocation})
                                 self.env.cr.commit()
@@ -512,6 +510,10 @@ class account_invoice(models.Model):
                                 self.env.cr.commit()
                             else:
                                 raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(str(round(amt, 2))))         
+                        
+                        for line in cn.credit_note_id.move_id.line_ids:
+                            if line.account_id.id == self.account_id.id and line.reconciled == False and line.credit == 0 and line.debit == 0:
+                                line.unlink()
         # if self.type == 'out_refund':
         self.update_invoice_and_credit_note_lines()  
 
