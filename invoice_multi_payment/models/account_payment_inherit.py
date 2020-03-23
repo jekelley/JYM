@@ -444,7 +444,7 @@ class account_invoice(models.Model):
                     self.env.cr.commit()
                     self['payment_move_line_ids'] = [(4, payment_line.id)]
                     self.register_payment(payment_line)
-        if self.type == 'out_refund':
+        # if self.type == 'out_refund':
 
 
 
