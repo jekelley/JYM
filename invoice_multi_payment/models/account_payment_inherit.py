@@ -453,8 +453,8 @@ class account_invoice(models.Model):
 
                             payment_line = self.env['account.move.line'].create(p_data)
                             
-                            move_line['credit'] = move_line.credit - cn.allocation
-                            payment_line['credit'] = cn.allocation
+                            move_line.sudo().write({'credit': move_line.credit - cn.allocation})
+                            payment_line.sudo().write({'credit': cn.allocation})
                             self.env.cr.commit()
 
                             cn.credit_note_id.move_id.action_post()
