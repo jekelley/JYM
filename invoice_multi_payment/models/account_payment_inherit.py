@@ -444,9 +444,20 @@ class account_invoice(models.Model):
                     if cn.allocation > 0:
                         p_data = {'account_id': self.account_id.id, 'partner_id': self.partner_id.id, 'credit': cn.allocation, 'invoice_id': cn.credit_note_id.id, 'move_id': cn.credit_note_id.move_id.id}
                         payment_line = self.env['account.move.line'].create(p_data)
-                        self.env.cr.commit()
-                        # self['payment_move_line_ids'] = [(4, payment_line.id)]
-                        # self.register_payment(payment_line)
+                        move_line = False
+                        for lines in cn.credit_note_id.move_id.line_ids:
+                            if line.credit > cn.allocation:
+                                move_line = line
+                                break
+                        if move_line:
+                            move_line['credit'] = move_line.credit - cn.allocation
+                            self.env.cr.commit()
+                            self['payment_move_line_ids'] = [(4, payment_line.id)]
+                            self.register_payment(payment_line)
+                        else:
+                            raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(round(amt, 2)))
+            
+                        
         # if self.type == 'out_refund':
 
 
