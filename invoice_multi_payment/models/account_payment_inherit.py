@@ -457,7 +457,7 @@ class account_invoice(models.Model):
 
                         entry_move_lines = []
                         for line in cn.credit_note_id.move_id.line_ids:
-                            entry_move_lines = [(4, line)]
+                            entry_move_lines.append(line)
                         
                         move_line = False
                         for line in entry_move_lines:
