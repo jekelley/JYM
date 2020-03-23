@@ -486,12 +486,17 @@ class account_invoice(models.Model):
                                 amt_left = cn.allocation
                                 for line in cn.credit_note_id.move_id.line_ids:
                                     if line.account_id.id == self.account_id.id and line.reconciled == False:
-                                        if amt_left > 0:
+                                        if amt_left <= 0:
                                             break
                                         else:
                                             if amt_left >= line.credit:
-                                                amt_left -= line.credit
+                                                cred = line.credit
+                                                line.with_context(check_move_validity=False).write({'credit': cred - amt_left})
+                                                amt_left -= cred
+                                            else:
+                                                cred = line.credit
                                                 line.with_context(check_move_validity=False).write({'credit': 0})
+                                                amt_left -= cred
                                 self.env.cr.commit()
                                 move.action_post()
 
