@@ -446,7 +446,7 @@ class account_invoice(models.Model):
                         p_data = {'account_id': self.account_id.id, 'partner_id': self.partner_id.id, 'credit': 0, 'invoice_id': cn.credit_note_id.id, 'move_id': cn.credit_note_id.move_id.id}
                         move_line = False
                         for line in cn.credit_note_id.move_id.line_ids:
-                            if line.account_id.id == self.account_id.id and line.credit > cn.allocation:
+                            if line.account_id.id == self.account_id.id and line.reconciled == False and line.credit >= cn.allocation:
                                 move_line = line
                                 break
                         if move_line:
@@ -473,7 +473,37 @@ class account_invoice(models.Model):
                                     invoice.register_payment(p)
                             self.env.cr.commit()
                         else:
-                            raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(str(round(amt, 2))))         
+                            unreconciled_amt = 0
+                            for line in cn.credit_note_id.move_id.line_ids:
+                                if line.account_id.id == self.account_id.id and line.reconciled == False:
+                                    unreconciled_amt += line.credit
+                            if unreconciled_amt >= cn.allocation:
+                                move = cn.credit_note_id.move_id
+                                move.button_cancel()
+
+                                payment_line = self.env['account.move.line'].create(p_data)
+                                self.env.cr.commit()
+                                amt_left = cn.allocation
+                                for line in cn.credit_note_id.move_id.line_ids:
+                                    if line.account_id.id == self.account_id.id and line.reconciled == False:
+                                        if amt_left > 0:
+                                            break
+                                        else:
+                                            if amt_left >= line.credit:
+                                                amt_left -= line.credit
+                                                line.with_context(check_move_validity=False).write({'credit': 0})
+                                self.env.cr.commit()
+                                move.action_post()
+
+                                self['payment_move_line_ids'] = [(4, payment_line.id)]
+                                self.env.cr.commit()
+                                
+                                for p in invoice.payment_move_line_ids:
+                                    if p.id == payment_line.id:
+                                        invoice.register_payment(p)
+                                self.env.cr.commit()
+                            else:
+                                raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(str(round(amt, 2))))         
         # if self.type == 'out_refund':
         self.update_invoice_and_credit_note_lines()  
 
