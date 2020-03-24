@@ -550,7 +550,7 @@ class account_invoice(models.Model):
 
                             move.action_post()
 
-                            self['payment_move_line_ids'] = [(4, payment_line.id)]
+                            inv.invoice_id['payment_move_line_ids'] = [(4, payment_line.id)]
                             self.env.cr.commit()
                             
                             for p in inv.invoice_id.payment_move_line_ids:
@@ -586,7 +586,7 @@ class account_invoice(models.Model):
                                 self.env.cr.commit()
                                 move.action_post()
 
-                                self['payment_move_line_ids'] = [(4, payment_line.id)]
+                                inv.invoice_id['payment_move_line_ids'] = [(4, payment_line.id)]
                                 self.env.cr.commit()
                                 
                                 for p in inv.invoice_id.payment_move_line_ids:
