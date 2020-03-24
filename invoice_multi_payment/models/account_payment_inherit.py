@@ -439,7 +439,7 @@ class account_invoice(models.Model):
                 else:
                     amt += cn.allocation
             if round(amt, 2) > round(self.residual, 2):
-                raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(round(amt, 2)))
+                raise ValidationError(("Total allocated amount is higher than Invoice due amount. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(round(amt, 2)))
             else:
                 for cn in self.credit_note_lines:
                     if cn.allocation > 0:
@@ -517,7 +517,91 @@ class account_invoice(models.Model):
                             if line.account_id.id == self.account_id.id and line.reconciled == False and line.credit == 0 and line.debit == 0:
                                 line.unlink()
                         move.action_post()
-        # if self.type == 'out_refund':
+
+        if self.type == 'out_refund':
+            credit_note = self
+            amt = 0
+            for inv in self.invoice_lines:
+                if round(inv.allocation, 2) > round(inv.open_amount, 2):
+                    raise ValidationError(("Allocated amount for Invoice " + str(inv.invoice) + " is higher than the due amount. Due amount is equal to " + str(round(inv.open_amount, 2)) + " and allocated amount is equal to %s") %(round(inv.allocation, 2)))
+                else:
+                    amt += inv.allocation
+            if round(amt, 2) > round(self.residual, 2):
+                raise ValidationError(("Total allocated amount is higher than Credit Note due amount. Credit Note due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(round(amt, 2)))
+            else:
+                for inv in self.invoice_lines:
+                    if inv.allocation > 0:
+                        p_data = {'account_id': inv.invoice_id.account_id.id, 'partner_id': self.partner_id.id, 'credit': 0, 'invoice_id': self.id, 'move_id': self.move_id.id}
+                        move_line = False
+                        for line in self.move_id.line_ids:
+                            if line.account_id.id == inv.invoice_id.account_id.id and line.reconciled == False and line.credit >= inv.allocation:
+                                move_line = line
+                                break
+                        if move_line:
+                            move = self.move_id
+                            move.button_cancel()
+
+                            payment_line = self.env['account.move.line'].create(p_data)
+                            self.env.cr.commit()
+
+                            move_line.with_context(check_move_validity=False).write({'credit': move_line.credit - inv.allocation})
+                            payment_line.with_context(check_move_validity=False).write({'credit': inv.allocation})
+                            self.env.cr.commit()
+
+                            move.action_post()
+
+                            self['payment_move_line_ids'] = [(4, payment_line.id)]
+                            self.env.cr.commit()
+                            
+                            for p in inv.invoice_id.payment_move_line_ids:
+                                if p.id == payment_line.id:
+                                    inv.invoice_id.register_payment(p)
+                            self.env.cr.commit()
+                        else:
+                            unreconciled_amt = 0
+                            for line in self.move_id.line_ids:
+                                if line.account_id.id == inv.invoice_id.account_id.id and line.reconciled == False:
+                                    unreconciled_amt += line.credit
+                            if unreconciled_amt >= inv.allocation:
+                                move = inv.invoice_id.move_id
+                                move.button_cancel()
+
+                                payment_line = self.env['account.move.line'].create(p_data)
+                                self.env.cr.commit()
+                                amt_left = inv.allocation
+                                for line in self.move_id.line_ids:
+                                    if line.account_id.id == inv.invoice_id.account_id.id and line.reconciled == False:
+                                        if amt_left <= 0:
+                                            break
+                                        else:
+                                            if amt_left <= line.credit:
+                                                cred = line.credit
+                                                line.with_context(check_move_validity=False).write({'credit': cred - amt_left})
+                                                amt_left -= cred
+                                            else:
+                                                cred = line.credit
+                                                line.with_context(check_move_validity=False).write({'credit': 0})
+                                                amt_left -= cred
+                                payment_line.with_context(check_move_validity=False).write({'credit': inv.allocation})
+                                self.env.cr.commit()
+                                move.action_post()
+
+                                self['payment_move_line_ids'] = [(4, payment_line.id)]
+                                self.env.cr.commit()
+                                
+                                for p in inv.invoice_id.payment_move_line_ids:
+                                    if p.id == payment_line.id:
+                                        inv.invoice_id.register_payment(p)
+                                self.env.cr.commit()
+                            else:
+                                raise ValidationError(("Total allocated amount and Invoice due amount are not equal. Invoice due amount is equal to " + str(round(self.residual, 2)) + " and Total allocated amount is equal to %s") %(str(round(amt, 2))))         
+                        
+                        move = self.move_id
+                        move.button_cancel()
+                        for line in self.move_id.line_ids:
+                            if line.account_id.id == inv.invoice_id.account_id.id and line.reconciled == False and line.credit == 0 and line.debit == 0:
+                                line.unlink()
+                        move.action_post()
         self.update_invoice_and_credit_note_lines()  
 
 
