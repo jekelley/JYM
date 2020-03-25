@@ -19,6 +19,7 @@
 									<field name="due_date" readonly="True"/>
 									<field name="total_amount" readonly="True" sum="Total Amount"/> 
 									<field name="open_amount" readonly="True" sum="Due Amount"/> 
+									<field name="discount" sum="Discount Amount"/>
 									<field name="allocation" sum="Allocated Amount"/>
 								</tree>
 								<form string="Invoice" create="false">
