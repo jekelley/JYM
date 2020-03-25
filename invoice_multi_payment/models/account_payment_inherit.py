@@ -53,7 +53,7 @@ class account_payment(models.Model):
                        }
                 line.append((0, 0, vals))
             self.invoice_lines = line
-            self.onchnage_amount() 
+            # self.onchnage_amount() 
         
     @api.onchange('payment_type')
     def _onchange_payment_type(self):
@@ -74,18 +74,18 @@ class account_payment(models.Model):
         res['domain']['journal_id'].append(('type', 'in', ('bank', 'cash')))
         return res
     
-    @api.onchange('amount')
-    def onchnage_amount(self):
-        total = 0.0
-        remain = self.amount
-        for line in self.invoice_lines:
-            if line.open_amount <= remain:
-                line.allocation = line.open_amount
-                remain -= line.allocation
-            else:
-                line.allocation = remain
-                remain -= line.allocation
-            total += line.allocation
+    # @api.onchange('amount')
+    # def onchnage_amount(self):
+    #     total = 0.0
+    #     remain = self.amount
+    #     for line in self.invoice_lines:
+    #         if line.open_amount <= remain:
+    #             line.allocation = line.open_amount
+    #             remain -= line.allocation
+    #         else:
+    #             line.allocation = remain
+    #             remain -= line.allocation
+    #         total += line.allocation
 
     @api.multi
     def post(self):
