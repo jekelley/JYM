@@ -53,7 +53,7 @@ class account_payment(models.Model):
                        }
                 line.append((0, 0, vals))
             self.invoice_lines = line
-            self.onchnage_amount() 
+            # self.onchnage_amount() 
         
     @api.onchange('payment_type')
     def _onchange_payment_type(self):
