@@ -131,7 +131,7 @@ class account_payment(models.Model):
                             'price_unit': -1 * amount,
                             'invoice_id': recorde.id,
                             'account_id': 306,
-                            'product_id': 654,
+                            'product_id': 397,
                         })
                         
                         self.env.cr.commit()
