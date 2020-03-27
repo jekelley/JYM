@@ -367,11 +367,27 @@ class CreditNoteInvoiceLine(models.Model):
             data.total_amount = invoice_id.amount_total 
             data.open_amount = invoice_id.residual
 
+class invoice_registered_payment(models.Model):
+    _name = 'account.invoice.payment.registered'
+
+    name = fields.Char(String="Name")
+    journal_name = fields.Char(String="Journal Name")
+    amount = fields.Float(String="Amount")
+    currency = fields.Char(String="Currency")
+    date = fields.Date(String="Payment Date")
+    payment_id = fields.Many2one('account.move.line', String="Payment")
+    move_id = fields.Many2one('account.move', String="Journal Entry")
+    ref = fields.Char(String="Payment Ref")
+    invoice_id = fields.Many2one('account.invoice', String="Invoice")
+    # digits = [69, currency_id.decimal_places],
+    # position = currency_id.position,
+
 class account_invoice(models.Model):
     _inherit = 'account.invoice'
 
     credit_note_lines = fields.One2many('invoice.creditnote.line', 'invoice_id', string="Credit Note Lines")
     invoice_lines = fields.One2many('creditnote.invoice.line', 'credit_note_id', string="Invoice Lines")
+    registered_payments = fields.One2many('account.invoice.payment.registered', 'invoice_id', String="Payments Registered", compute="_get_payments", store=False)
 
     @api.multi
     def update_invoice_and_credit_note_lines(self):
@@ -637,3 +653,51 @@ class account_invoice(models.Model):
     #             line.allocation = remain
     #             remain -= line.allocation
     #         total += line.allocation
+
+    @api.one
+    @api.depends('payment_move_line_ids.amount_residual')
+    def _get_payments(self):
+        for data in self:
+            if self.payment_move_line_ids:
+                # info = {'title': _('Less Payment'), 'outstanding': False, 'content': []}
+                payments_registered = []
+                currency_id = self.currency_id
+                for payment in self.payment_move_line_ids:
+                    payment_currency_id = False
+                    if self.type in ('out_invoice', 'in_refund'):
+                        amount = sum([p.amount for p in payment.matched_debit_ids if p.debit_move_id in self.move_id.line_ids])
+                        amount_currency = sum([p.amount_currency for p in payment.matched_debit_ids if p.debit_move_id in self.move_id.line_ids])
+                        if payment.matched_debit_ids:
+                            payment_currency_id = all([p.currency_id == payment.matched_debit_ids[0].currency_id for p in payment.matched_debit_ids]) and payment.matched_debit_ids[0].currency_id or False
+                    elif self.type in ('in_invoice', 'out_refund'):
+                        amount = sum([p.amount for p in payment.matched_credit_ids if p.credit_move_id in self.move_id.line_ids])
+                        amount_currency = sum([p.amount_currency for p in payment.matched_credit_ids if p.credit_move_id in self.move_id.line_ids])
+                        if payment.matched_credit_ids:
+                            payment_currency_id = all([p.currency_id == payment.matched_credit_ids[0].currency_id for p in payment.matched_credit_ids]) and payment.matched_credit_ids[0].currency_id or False
+                    # get the payment value in invoice currency
+                    if payment_currency_id and payment_currency_id == self.currency_id:
+                        amount_to_show = amount_currency
+                    else:
+                        amount_to_show = payment.company_id.currency_id.with_context(date=payment.date).compute(amount, self.currency_id)
+                    if float_is_zero(amount_to_show, precision_rounding=self.currency_id.rounding):
+                        continue
+                    payment_ref = payment.move_id.name
+                    if payment.move_id.ref:
+                        payment_ref += ' (' + payment.move_id.ref + ')'
+
+                    payment_data = ({
+                        'name': payment.name,
+                        'journal_name': payment.journal_id.name,
+                        'amount': amount_to_show,
+                        'currency': currency_id.symbol,
+                        'date': payment.date,
+                        'payment_id': payment.id,
+                        'move_id': payment.move_id.id,
+                        'ref': payment_ref,
+                    })
+
+                    p = self.env['account.invoice.payment.registered'].create(payment_data)
+                    self.env.cr.commit()
+
+                    payments_registered.append(p.id)
+                data['registered_payments'] = [(6, 0, payments_registered)]
