@@ -1,5 +1,6 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import float_is_zero
 
 class account_payment(models.Model):
     _inherit = 'account.payment'
