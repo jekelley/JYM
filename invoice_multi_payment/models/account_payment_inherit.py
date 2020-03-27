@@ -656,11 +656,12 @@ class account_invoice(models.Model):
     #         total += line.allocation
 
     @api.multi
-    @api.depends('payment_move_line_ids.amount_residual')
+    @api.depends('residual')
     def _get_payments_registered_in_invoice(self):
         for s in self:
             if s.payment_move_line_ids:
-                # s.registered_payments = []
+                for pa in s.registered_payments:
+                    pa.unlink()
                 # info = {'title': _('Less Payment'), 'outstanding': False, 'content': []}
                 payments_registered = []
                 currency_id = s.currency_id
