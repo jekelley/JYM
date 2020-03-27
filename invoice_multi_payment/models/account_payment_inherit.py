@@ -685,8 +685,8 @@ class account_invoice(models.Model):
                     else:
                         # amount_to_show = payment.company_id.currency_id.with_context(date=payment.date).compute(amount, s.currency_id)
                         amount_to_show = amount
-                    # if float_is_zero(amount_to_show, precision_rounding=s.currency_id.rounding):
-                    #     continue
+                    if float_is_zero(amount_to_show, precision_rounding=s.currency_id.rounding):
+                        continue
                     payment_ref = payment.move_id.name
                     if payment.move_id.ref:
                         payment_ref += ' (' + payment.move_id.ref + ')'
