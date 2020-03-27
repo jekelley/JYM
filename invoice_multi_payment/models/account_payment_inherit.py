@@ -388,7 +388,7 @@ class account_invoice(models.Model):
 
     credit_note_lines = fields.One2many('invoice.creditnote.line', 'invoice_id', string="Credit Note Lines")
     invoice_lines = fields.One2many('creditnote.invoice.line', 'credit_note_id', string="Invoice Lines")
-    registered_payments = fields.One2many('account.invoice.payment.registered', 'invoice_id', String="Payments Registered", compute="_get_payments_registered_in_invoice", store=True)
+    registered_payments = fields.One2many('account.invoice.payment.registered', 'invoice_id', String="Payments Registered", compute="_get_payments_registered_in_invoice", store=False)
 
     @api.multi
     def update_invoice_and_credit_note_lines(self):
@@ -660,8 +660,8 @@ class account_invoice(models.Model):
     def _get_payments_registered_in_invoice(self):
         for s in self:
             if s.payment_move_line_ids:
-                for pa in s.registered_payments:
-                    pa.unlink()
+                # for pa in s.registered_payments:
+                #     pa.unlink()
                 # info = {'title': _('Less Payment'), 'outstanding': False, 'content': []}
                 payments_registered = []
                 currency_id = s.currency_id
