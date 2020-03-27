@@ -388,7 +388,7 @@ class account_invoice(models.Model):
 
     credit_note_lines = fields.One2many('invoice.creditnote.line', 'invoice_id', string="Credit Note Lines")
     invoice_lines = fields.One2many('creditnote.invoice.line', 'credit_note_id', string="Invoice Lines")
-    registered_payments = fields.One2many('account.invoice.payment.registered', 'invoice_id', String="Payments Registered", compute="_get_payments", store=True)
+    # registered_payments = fields.One2many('account.invoice.payment.registered', 'invoice_id', String="Payments Registered", compute="_get_payments", store=True)
 
     @api.multi
     def update_invoice_and_credit_note_lines(self):
@@ -655,7 +655,7 @@ class account_invoice(models.Model):
     #             remain -= line.allocation
     #         total += line.allocation
 
-    @api.one
+    # @api.one
     @api.depends('payment_move_line_ids.amount_residual')
     def _get_payments(self):
         if self.payment_move_line_ids:
@@ -701,5 +701,5 @@ class account_invoice(models.Model):
                 p = self.env['account.invoice.payment.registered'].create(payment_data)
                 self.env.cr.commit()
 
-                payments_registered.append(p.id)
+                # payments_registered.append(p.id)
             # self.registered_payments = [(6, 0, payments_registered)]
