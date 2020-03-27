@@ -694,7 +694,7 @@ class account_invoice(models.Model):
                     'date': payment.date,
                     'payment_id': payment.id,
                     'move_id': payment.move_id.id,
-                    # 'invoice_id': self.id,
+                    'invoice_id': self.id,
                     'ref': payment_ref,
                 })
 
@@ -702,4 +702,4 @@ class account_invoice(models.Model):
                 self.env.cr.commit()
 
                 payments_registered.append(p.id)
-            self.registered_payments = [(6, 0, payments_registered)]
+            # self.registered_payments = [(6, 0, payments_registered)]
