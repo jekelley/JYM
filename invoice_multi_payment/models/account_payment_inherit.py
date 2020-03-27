@@ -659,6 +659,7 @@ class account_invoice(models.Model):
     @api.depends('payment_move_line_ids.amount_residual')
     def _get_payments(self):
         if self.payment_move_line_ids:
+            self.registered_payments = []
             # info = {'title': _('Less Payment'), 'outstanding': False, 'content': []}
             payments_registered = []
             currency_id = self.currency_id
