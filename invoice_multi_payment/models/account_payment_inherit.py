@@ -657,6 +657,7 @@ class account_invoice(models.Model):
 
     @api.multi
     @api.depends('residual')
+    @api.depends('payment_move_line_ids.amount_residual')
     def _get_payments_registered_in_invoice(self):
         for s in self:
             if s.payment_move_line_ids:
